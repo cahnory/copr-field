@@ -60,18 +60,18 @@ If the processed input failed one or more of the copper rules, `process` will re
 
 ```json
 {
-  error: "VALIDATION_RULE",
-  value: 16,
-  content: [
+  "error": "VALIDATION_RULE",
+  "value": 16,
+  "content": [
     {
-      pass: true,
-      rule: {...},
-      content: []
+      "pass": true,
+      "rule": {...},
+      "content": []
     },
     {
-      pass: false,
-      rule: {...},
-      content: []
+      "pass": false,
+      "rule": {...},
+      "content": []
     }
   ]
 }
