@@ -1,4 +1,4 @@
-# ✨ copper-field
+# ✨ copr-field
 
 ## Table of Contents
 
@@ -12,12 +12,12 @@
 ## Install
 
 ```bash
-$ npm install copper-field
+$ npm install copr-field
 ```
 
 ## Contributors
 
-- [Jérémy DE LA CASA](https://github.com/jeremydelacasa) - for finding this awesome name.
+- [Jérémy De la casa](https://github.com/jeremydelacasa) - for finding the awesome _copper-field_ name and the definitive npm accepted one.
 
 ## The copper object
 
