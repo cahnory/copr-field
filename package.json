@@ -1,7 +1,7 @@
 {
   "name": "copr-field",
-  "version": "0.1.0",
-  "main": "index.js",
+  "version": "0.1.1",
+  "main": "lib/index.js",
   "author": "Cahnory (https://github.com/cahnory)",
   "contributors": [
     "Jérémy De la casa (https://github.com/jeremydelacasa)"
