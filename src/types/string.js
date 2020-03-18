@@ -1,6 +1,6 @@
-export const parse = input => input;
+export const parse = input => `${input}`;
 
-export const validate = input => true;
+export const validate = input => typeof input === 'string';
 
 export default {
   parse,
