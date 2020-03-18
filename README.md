@@ -9,6 +9,7 @@
   - [process](#copper.process)
   - [validate](#copper.validate)
 - [Built-in types](#built-in-types)
+  - [date](#date)
   - [number](#number)
   - [string](#string)
 - [Rule definition](#rule-definition)
@@ -91,7 +92,25 @@ It returns a [report](#report).
 
 ## Built-in types
 
-### number
+### Date
+
+```js
+import dateType, { isAfter } from 'copr-field/lib/types/date';
+```
+
+### Date tests
+
+- isAfter(value: `date`, inf: `date`)
+- isBefore(value: `date`, sup: `date`)
+- isEqual(value: `date`, inf: `date`)
+- isSameYear(value: `date`, other: `date`)
+- isSameMonth(value: `date`, other: `date`)
+- isSameMonthOfYear(value: `date`, other: `date`)
+- isSameDayOfWeek(value: `date`, other: `date`)
+- isSameDayOfMonth(value: `date`, other: `date`)
+- isSameDay(value: `date`, other: `date`)
+
+### Number
 
 ```js
 import numberType, { isGreater } from 'copr-field/lib/types/number';
@@ -107,7 +126,7 @@ import numberType, { isGreater } from 'copr-field/lib/types/number';
 - isPositive(value: `number`)
 - isNegative(value: `number`)
 
-### string
+### String
 
 ```js
 import stringType, { isLonger } from 'copr-field/lib/types/string';

@@ -2,7 +2,7 @@ import { VALIDATION_RULE, VALIDATION_TYPE } from './errors';
 
 import { runPreparedRuleList, prepareRuleList } from './rules';
 
-const createParser = (type, ruleList = []) => {
+const createCopper = (type, ruleList = []) => {
   const rules = prepareRuleList(ruleList);
 
   const parse = input => {
@@ -41,4 +41,4 @@ const createParser = (type, ruleList = []) => {
   };
 };
 
-export default createParser;
+export default createCopper;
