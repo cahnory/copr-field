@@ -1,5 +1,7 @@
 # ✨ copr-field
 
+Input parser and validator.
+
 ## Table of Contents
 
 - [Install](#install)
@@ -22,8 +24,9 @@
   - [test](#rule.test)
 - [Report](#report)
   - [Content property](#content-property)
-  - [Process type error](#process-type-error)
-  - [Process rule error](#process-rule-error)
+  - [Empty error](#empty-error)
+  - [Type error](#type-error)
+  - [Rule error](#rule-error)
 
 ## Install
 
@@ -37,26 +40,27 @@ $ npm install copr-field
 
 ## The copper object
 
-The copper object is created given a _type_ and some _rules_.
+The copper object is created given a _type_ and optional _rules_.
 
 ```js
-import copperField from 'copper-field';
-import numberType, {
-  isInteger,
-  isGreater,
-} from 'copper-field/lib/types/number';
+import copperField from 'copr-field';
+import numberType, { isInteger, isGreater } from 'copr-field/types/number';
 
-const copper = copperField(numberType, [
-  { test: isInteger, meta: { description: 'Must be an integer' } },
-  {
-    test: isGreater,
-    args: [18],
-    meta: { description: 'Must be greater than 18' },
-  },
-]);
+const copper = copperField({
+  type: numberType,
+  allowEmpty: false,
+  rules: [
+    { test: isInteger, meta: { description: 'Must be an integer' } },
+    {
+      test: isGreater,
+      args: [18],
+      meta: { description: 'Must be greater than 18' },
+    },
+  ],
+});
 ```
 
-You can now process input with it using its precess method:
+You can now process input with it using its process method:
 
 ```js
 const result = copper.process(ageInput);
@@ -70,7 +74,7 @@ copper.parse('18');
 
 Function accepting an input to parse without testing it against the copper rules.
 
-It output the parsed value or throw a `VALIDATION_TYPE` if it fails.
+It outputs the parsed value or throw a `VALIDATION_TYPE` if it fails.
 
 ### copper.process
 
@@ -86,7 +90,7 @@ It returns a [report](#report).
 copper.parse(18);
 ```
 
-Function accepting a value to teste against the copper rules.
+Function accepting a value to test against the copper rules.
 
 It returns a [report](#report).
 
@@ -95,7 +99,7 @@ It returns a [report](#report).
 ### Date
 
 ```js
-import dateType, { isAfter } from 'copr-field/lib/types/date';
+import dateType, { isAfter } from 'copr-field/types/date';
 ```
 
 ### Date tests
@@ -113,7 +117,7 @@ import dateType, { isAfter } from 'copr-field/lib/types/date';
 ### Number
 
 ```js
-import numberType, { isGreater } from 'copr-field/lib/types/number';
+import numberType, { isGreater } from 'copr-field/types/number';
 ```
 
 ### Number tests
@@ -129,7 +133,7 @@ import numberType, { isGreater } from 'copr-field/lib/types/number';
 ### String
 
 ```js
-import stringType, { isLonger } from 'copr-field/lib/types/string';
+import stringType, { isLonger } from 'copr-field/types/string';
 ```
 
 ### String tests
@@ -256,8 +260,9 @@ The `test` property is ignored if the `all`, `not` or `oneOf` property is define
 
 The report is an object returned by the `copper.process` and `copper.validate` methods with the following properties:
 
-- **error**: `'VALIDATION_TYPE'` | `'VALIDATION_RULE'` | `undefined`
-- **value**: the parsed input or `undefined` if error is set to `'VALIDATION_TYPE'`
+- **error**: `'VALIDATION_EMPTY'` | `'VALIDATION_TYPE'` | `'VALIDATION_RULE'` | `undefined`
+- **isEmpty**: a `boolean`, true if the input is considered empty
+- **value**: the parsed input or `undefined` if error is set to `'VALIDATION_TYPE'` or the input is considered empty
 - **content**: an `array` containing the state of each one of the copper rules
 
 ### Content property
@@ -266,27 +271,41 @@ The content contains the state of each rules, represented by an object with the 
 
 - **pass**: a `boolean`, true if the rule passed
 - **rule**: the tested rule
-- **content**: an array containingthe state of all the sub rules in case the rule is set with the `all`, `not` or `oneOf` property
+- **content**: an array containing the state of all the sub rules defined with the `all`, `not` or `oneOf` property
 
-### Process type error
+### Empty error
 
-If the processed input could not be parsed into the copper type, `process` will return a `VALIDATION_TYPE` error:
+The report contains a `VALIDATION_EMPTY` error if the input is considered empty and `copper.allowEmpty` is `false`:
 
 ```json
 {
-  "error": "VALIDATION_TYPE",
+  "error": "VALIDATION_EMPTY",
+  "isEmpty": true,
   "content": []
 }
 ```
 
-### Process rule error
+### Type error
 
-If the processed input failed one or more of the copper rules, `process` will return a `VALIDATION_RULE` error:
+The report contains a `VALIDATION_TYPE` error if the input could not be parsed into the copper type:
+
+```json
+{
+  "error": "VALIDATION_TYPE",
+  "isEmpty": false,
+  "content": []
+}
+```
+
+### Rule error
+
+The report contains a `VALIDATION_RULE` error if the input failed one or more of the copper rules:
 
 ```json
 {
   "error": "VALIDATION_RULE",
   "value": 16,
+  "isEmpty": false,
   "content": [
     {
       "pass": true,
