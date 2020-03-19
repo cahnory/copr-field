@@ -1,12 +1,10 @@
-export const parse = input => parseFloat(input, 10);
+import { createType } from '../type';
 
-export const validate = input =>
-  Number.isFinite(1 + parseFloat(input, 10) && Number(input));
-
-export default {
-  parse,
-  validate,
-};
+export default createType({
+  parse: input => parseFloat(input, 10),
+  validate: input =>
+    Number.isFinite(1 + parseFloat(input, 10) && Number(input)),
+});
 
 export const isEqual = (value, sup) => value === sup;
 

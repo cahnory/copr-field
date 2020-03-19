@@ -13,8 +13,6 @@ describe('numberType.validate', () => {
     expect(numberType.validate(-1)).toBe(true);
     expect(numberType.validate(0)).toBe(true);
     expect(numberType.validate(1)).toBe(true);
-    expect(numberType.validate(null)).toBe(false);
-    expect(numberType.validate(undefined)).toBe(false);
   });
   it('handles integers expressed as string', () => {
     expect(numberType.validate('-1')).toBe(true);
@@ -30,6 +28,15 @@ describe('numberType.validate', () => {
     expect(numberType.validate('-1.23')).toBe(true);
     expect(numberType.validate('0.12')).toBe(true);
     expect(numberType.validate('1.23')).toBe(true);
+  });
+  it('rejects non number inputs', () => {
+    expect(numberType.validate('abc')).toBe(false);
+    expect(numberType.validate('')).toBe(false);
+    expect(numberType.validate(NaN)).toBe(false);
+    expect(numberType.validate(null)).toBe(false);
+    expect(numberType.validate(undefined)).toBe(false);
+    expect(numberType.validate(true)).toBe(false);
+    expect(numberType.validate(false)).toBe(false);
   });
 });
 
@@ -53,6 +60,14 @@ describe('numberType.parse', () => {
     expect(numberType.parse('-1.23')).toEqual(-1.23);
     expect(numberType.parse('0.12')).toEqual(0.12);
     expect(numberType.parse('1.23')).toEqual(1.23);
+  });
+  it('returns undefined for non number inputs', () => {
+    expect(numberType.parse('')).toEqual(undefined);
+    expect(numberType.parse(NaN)).toEqual(undefined);
+    expect(numberType.parse(null)).toEqual(undefined);
+    expect(numberType.parse(undefined)).toEqual(undefined);
+    expect(numberType.parse(true)).toEqual(undefined);
+    expect(numberType.parse(false)).toEqual(undefined);
   });
 });
 

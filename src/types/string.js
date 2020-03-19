@@ -1,11 +1,9 @@
-export const parse = input => `${input}`;
+import { createType } from '../type';
 
-export const validate = input => typeof input === 'string';
-
-export default {
-  parse,
-  validate,
-};
+export default createType({
+  parse: input => `${input}`,
+  validate: input => typeof input === 'string',
+});
 
 export const isEqual = (value, sup) => value === sup;
 
