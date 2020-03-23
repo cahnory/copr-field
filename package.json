@@ -1,6 +1,6 @@
 {
   "name": "copr-field",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Input parser and validator",
   "main": "lib/index.js",
   "author": "Cahnory (https://github.com/cahnory)",
