@@ -9,7 +9,7 @@ import {
 } from './errors';
 
 import { runPreparedRuleList, prepareRuleList } from './rules';
-import { isEmpty } from './type';
+import { isEmptyValue } from './type';
 
 const createCopper = copper => {
   if (typeof copper !== 'object') {
@@ -37,7 +37,7 @@ const createCopper = copper => {
   const rules = prepareRuleList(ruleList);
 
   const parse = input => {
-    if (isEmpty(input)) {
+    if (isEmptyValue(input)) {
       return undefined;
     }
 
@@ -49,7 +49,7 @@ const createCopper = copper => {
   };
 
   const validate = (value, context) => {
-    if (isEmpty(value)) {
+    if (isEmptyValue(value)) {
       return createResult({
         isEmpty: true,
         error: allowEmpty ? undefined : VALIDATION_EMPTY,

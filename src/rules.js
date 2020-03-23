@@ -19,7 +19,7 @@ export const prepareRule = rule => {
     throw new Error(INVALIDE_RULE);
   }
 
-  let { test, meta = {} } = rule;
+  const { test, meta = {} } = rule;
   let getArgs;
   const { args: fixedArgs = [], getArgs: unsafeGetArgs } = rule;
 
@@ -76,17 +76,18 @@ export const runPreparedRuleList = (value, ruleList, context) => {
 export const runPreparedRule = (value, rule, context) => {
   if (rule.all) {
     return runPreparedRuleIntersection(value, rule, context);
-  } else if (rule.not) {
-    return runPreparedRuleNot(value, rule, context);
-  } else if (rule.oneOf) {
-    return runPreparedRuleUnion(value, rule, context);
-  } else {
-    return {
-      pass: rule.test(value, ...rule.getArgs(context)),
-      rule,
-      content: [],
-    };
   }
+  if (rule.not) {
+    return runPreparedRuleNot(value, rule, context);
+  }
+  if (rule.oneOf) {
+    return runPreparedRuleUnion(value, rule, context);
+  }
+  return {
+    pass: rule.test(value, ...rule.getArgs(context)),
+    rule,
+    content: [],
+  };
 };
 
 export const runPreparedRuleIntersection = (value, rule, context) => {

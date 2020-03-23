@@ -5,7 +5,7 @@ export const createType = ({ parse, validate }) => {
     throw new Error(INVALIDE_TYPE);
   }
 
-  const safeValidate = input => !isEmpty(input) && validate(input);
+  const safeValidate = input => !isEmptyValue(input) && validate(input);
 
   return {
     parse: input => (safeValidate(input) ? parse(input) : undefined),
@@ -13,5 +13,5 @@ export const createType = ({ parse, validate }) => {
   };
 };
 
-export const isEmpty = input =>
+export const isEmptyValue = input =>
   input === '' || input === null || input === undefined || Number.isNaN(input);
