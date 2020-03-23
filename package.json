@@ -19,7 +19,7 @@
     "validator"
   ],
   "scripts": {
-    "prepare": "babel src -d lib",
+    "prepare": "rm -rf lib && babel src -d lib",
     "test": "jest --coverage"
   },
   "devDependencies": {
