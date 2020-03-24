@@ -1,6 +1,7 @@
 import {
   INVALIDE_COPPER,
   INVALIDE_COPPER_ALLOW_EMPTY,
+  INVALIDE_COPPER_META,
   INVALIDE_COPPER_RULES,
   INVALIDE_COPPER_TYPE,
   VALIDATION_EMPTY,
@@ -16,7 +17,7 @@ const createCopperField = copper => {
     throw new Error(INVALIDE_COPPER);
   }
 
-  const { type, rules: ruleList = [], allowEmpty = false } = copper;
+  const { type, meta = {}, rules: ruleList = [], allowEmpty = false } = copper;
 
   if (!Array.isArray(ruleList)) {
     throw new Error(INVALIDE_COPPER_RULES);
@@ -24,6 +25,10 @@ const createCopperField = copper => {
 
   if (typeof allowEmpty !== 'boolean') {
     throw new Error(INVALIDE_COPPER_ALLOW_EMPTY);
+  }
+
+  if (typeof meta !== 'object') {
+    throw new Error(INVALIDE_COPPER_META);
   }
 
   if (
@@ -80,6 +85,7 @@ const createCopperField = copper => {
   return {
     allowEmpty,
     type,
+    meta,
     rules,
     parse,
     validate,

@@ -1,4 +1,4 @@
-const createCopperSet = ({ fields }) => {
+const createCopperSet = ({ fields, meta = {} }) => {
   const formEntries = Object.entries(fields);
 
   const parse = inputs =>
@@ -52,6 +52,7 @@ const createCopperSet = ({ fields }) => {
 
   return {
     fields,
+    meta,
     parse,
     validate,
     process,
