@@ -15,7 +15,7 @@ export const prepareRule = rule => {
     return prepareRule({ test: rule });
   }
 
-  if (typeof rule !== 'object') {
+  if (!rule || typeof rule !== 'object' || Array.isArray(rule)) {
     throw new Error(INVALIDE_RULE);
   }
 
@@ -23,7 +23,7 @@ export const prepareRule = rule => {
   let getArgs;
   const { args: fixedArgs = [], getArgs: unsafeGetArgs } = rule;
 
-  if (typeof meta !== 'object' || Array.isArray(meta)) {
+  if (!meta || typeof meta !== 'object' || Array.isArray(meta)) {
     throw new Error(INVALIDE_RULE_META);
   }
 
@@ -50,7 +50,7 @@ export const prepareRule = rule => {
     throw new Error(INVALIDE_RULE_ARGS);
   }
 
-  if (typeof getArgs !== 'function') {
+  if (typeof unsafeGetArgs !== 'function') {
     getArgs = () => fixedArgs;
   } else {
     getArgs = context => {
