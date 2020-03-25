@@ -53,6 +53,14 @@ const createCopperField = copper => {
     return type.parse(input);
   };
 
+  const getValue = input => {
+    try {
+      return parse(input);
+    } catch (e) {
+      return undefined;
+    }
+  };
+
   const validate = (value, context) => {
     if (isEmptyValue(value)) {
       return createResult({
@@ -87,6 +95,7 @@ const createCopperField = copper => {
     type,
     meta,
     rules,
+    getValue,
     parse,
     validate,
     process,

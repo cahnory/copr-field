@@ -8,6 +8,13 @@ const createCopperSet = ({ fields, meta = {} }) => {
       return acc;
     }, {});
 
+  const getValue = inputs =>
+    formEntries.reduce((acc, [name, copper]) => {
+      acc[name] = copper.getValue(inputs[name]);
+
+      return acc;
+    }, {});
+
   const validate = (values, context) => {
     let pass = true;
 
@@ -53,6 +60,7 @@ const createCopperSet = ({ fields, meta = {} }) => {
   return {
     fields,
     meta,
+    getValue,
     parse,
     validate,
     process,
