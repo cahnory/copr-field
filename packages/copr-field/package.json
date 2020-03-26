@@ -20,5 +20,8 @@
     "value",
     "validation",
     "validator"
-  ]
+  ],
+  "devDependencies": {
+    "@babel/cli": "^7.8.4"
+  }
 }
