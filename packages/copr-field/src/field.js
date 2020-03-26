@@ -109,4 +109,4 @@ export const createResult = ({
   error,
   isEmpty = false,
   value,
-}) => ({ content, error, isEmpty, value });
+}) => ({ content, error, isEmpty, pass: !error, value });

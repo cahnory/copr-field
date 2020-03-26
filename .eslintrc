@@ -2,14 +2,16 @@
   "env": {
     "es6": true
   },
-  "extends": ["airbnb-base", "prettier"],
+  "extends": ["airbnb", "airbnb/hooks", "prettier"],
   "parserOptions": {
     "sourceType": "module"
   },
   "plugins": ["prettier"],
   "rules": {
     "prettier/prettier": ["error"],
-    "no-use-before-define": "off"
+    "no-use-before-define": "off",
+    "react/jsx-filename-extension": "off",
+    "react/forbid-prop-types": "off"
   },
   "overrides": [
     {

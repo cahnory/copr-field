@@ -1,19 +1,32 @@
+import { VALIDATION_TYPE } from './errors';
+
 const createCopperSet = ({ fields, meta = {} }) => {
   const formEntries = Object.entries(fields);
 
-  const parse = inputs =>
-    formEntries.reduce((acc, [name, copper]) => {
+  const parse = (inputs = {}) => {
+    if (!inputs || typeof inputs !== 'object' || Array.isArray(inputs)) {
+      throw new Error(VALIDATION_TYPE);
+    }
+
+    return formEntries.reduce((acc, [name, copper]) => {
       acc[name] = copper.parse(inputs[name]);
 
       return acc;
     }, {});
+  };
 
-  const getValue = inputs =>
-    formEntries.reduce((acc, [name, copper]) => {
+  const getValue = (rawInputs = {}) => {
+    const inputs =
+      rawInputs && typeof rawInputs === 'object' && !Array.isArray(rawInputs)
+        ? rawInputs
+        : {};
+
+    return formEntries.reduce((acc, [name, copper]) => {
       acc[name] = copper.getValue(inputs[name]);
 
       return acc;
     }, {});
+  };
 
   const validate = (values, context) => {
     let pass = true;

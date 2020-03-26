@@ -1,3 +1,4 @@
-/node_modules
-/lib
 /coverage
+/node_modules
+/packages/copr-field/lib
+/packages/copr-field-react/lib

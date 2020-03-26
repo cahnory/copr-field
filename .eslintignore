@@ -1,2 +1,5 @@
-node_modules
-lib
+/node_modules
+/packages/copr-field/lib
+/packages/copr-field/node_modules
+/packages/copr-field-react/lib
+/packages/copr-field-react/node_modules
