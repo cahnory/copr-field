@@ -1,0 +1,30 @@
+{
+  "name": "@copr-field/react",
+  "version": "0.5.0",
+  "description": "Input parser and validator",
+  "main": "lib/index.js",
+  "author": "Cahnory (https://github.com/cahnory)",
+  "contributors": [
+    "Jérémy De la casa (https://github.com/jeremydelacasa)"
+  ],
+  "scripts": {
+    "prepare": "rm -rf lib && babel --root-mode upward src -d lib"
+  },
+  "license": "MIT",
+  "repository": "https://github.com/cahnory/copr-field",
+  "keywords": [
+    "input",
+    "field",
+    "form",
+    "react",
+    "rules",
+    "value",
+    "validation",
+    "validator"
+  ],
+  "peerDependencies": {
+    "copr-field": "^0.5",
+    "prop-types": "^15",
+    "react": "^16"
+  }
+}
