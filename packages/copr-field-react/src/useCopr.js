@@ -25,6 +25,7 @@ const useCopr = (name = null) => {
   return {
     form: context.form,
     copr: context.copr.fields[name],
+    path: context.path.concat(name),
     result: context.result.content[name],
     setValue: newValue =>
       context.setValue({

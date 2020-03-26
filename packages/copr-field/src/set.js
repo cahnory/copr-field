@@ -32,16 +32,13 @@ const createCopperSet = ({ fields, meta = {} }) => {
     let pass = true;
 
     const content = formEntries.reduce((acc, [name, field]) => {
-      const { value, content: fieldContent, error } = field.validate(
-        values[name],
-        context,
-      );
+      const result = field.validate(values[name], context);
 
-      if (error) {
+      if (!result.pass) {
         pass = false;
       }
 
-      acc[name] = { content: fieldContent, error, field, value };
+      acc[name] = { ...result, field };
 
       return acc;
     }, {});
@@ -53,16 +50,13 @@ const createCopperSet = ({ fields, meta = {} }) => {
     let pass = true;
 
     const content = formEntries.reduce((acc, [name, field]) => {
-      const { value, content: fieldContent, error } = field.process(
-        inputs[name],
-        context,
-      );
+      const result = field.process(inputs[name], context);
 
-      if (error) {
+      if (!result.pass) {
         pass = false;
       }
 
-      acc[name] = { content: fieldContent, error, field, value };
+      acc[name] = { ...result, field };
 
       return acc;
     }, {});

@@ -30,7 +30,10 @@ const CoprForm = ({
   useEffect(() => {
     if (controlledInput !== null) {
       const nextValue = copr.getValue(controlledInput);
-      const nextResult = copr.process(nextValue, { nextValue, ...context });
+      const nextResult = copr.process(nextValue, {
+        value: nextValue,
+        ...context,
+      });
       setInput(controlledInput);
       setValue(nextValue);
       setResult(nextResult);
@@ -48,7 +51,10 @@ const CoprForm = ({
   const handleValue = useCallback(
     nextInput => {
       const nextValue = copr.getValue(nextInput);
-      const nextResult = copr.process(nextValue, { nextValue, ...context });
+      const nextResult = copr.process(nextValue, {
+        value: nextValue,
+        ...context,
+      });
       setInput(nextInput);
       setValue(nextValue);
       setResult(nextResult);
@@ -60,7 +66,7 @@ const CoprForm = ({
     [context, copr, onChange],
   );
 
-  const form = { result, value: input, setValue: handleValue, copr };
+  const form = { copr, setValue: handleValue, result, path: [], value: input };
   form.form = form;
 
   return <CoprContext.Provider value={form}>{children}</CoprContext.Provider>;
