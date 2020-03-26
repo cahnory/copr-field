@@ -1,6 +1,6 @@
 {
   "name": "@copr-field/react",
-  "version": "0.5.3",
+  "version": "0.5.4",
   "description": "Input parser and validator",
   "main": "lib/index.js",
   "author": "Cahnory (https://github.com/cahnory)",
