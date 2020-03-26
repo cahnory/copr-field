@@ -69,11 +69,14 @@ const CoprForm = ({
   const form = { copr, setValue: handleValue, result, path: [], value: input };
   form.form = form;
 
-  return <CoprContext.Provider value={form}>{children}</CoprContext.Provider>;
+  return (
+    <CoprContext.Provider value={form}>
+      {typeof children === 'function' ? children(form) : children}
+    </CoprContext.Provider>
+  );
 };
 
 CoprForm.defaultProps = {
-  children: null,
   context: {},
   initialValue: null,
   onChange: null,
@@ -82,7 +85,10 @@ CoprForm.defaultProps = {
 };
 
 CoprForm.propTypes = {
-  children: PropTypes.node,
+  children: PropTypes.oneOfType([
+    PropTypes.node.isRequired,
+    PropTypes.func.isRequired,
+  ]).isRequired,
   copr: PropTypes.object.isRequired,
   context: PropTypes.object,
   initialValue: PropTypes.any,
