@@ -46,12 +46,13 @@ const createCopperSet = copr => {
     let pendings = 0;
     let isEmpty = true;
     let result;
+    let initPendingSkipped = false;
     const value = {};
     const observer = observerFromOption(observerOption);
 
-    Promise.resolve(() => {
+    Promise.resolve().then(() => {
       observer.next(result);
-      if (!formEntries.length) {
+      if (!pendings) {
         observer.complete();
       }
     });
@@ -61,37 +62,41 @@ const createCopperSet = copr => {
         context,
         observer: {
           next: asyncResult => {
-            if (fieldResult.isPending && !asyncResult.isPending) {
-              if (asyncResult.isValid) {
-                failures -= 1;
+            if (fieldResult.isPending) {
+              if (!initPendingSkipped) {
+                initPendingSkipped = true;
+                return;
+              }
+              if (!asyncResult.isPending) {
+                if (asyncResult.isValid) {
+                  failures -= 1;
+                }
+
+                pendings -= 1;
               }
 
-              pendings -= 1;
+              content = {
+                ...content,
+                [name]: asyncResult,
+              };
+
+              const asyncError =
+                (isEmpty && !allowEmpty && VALIDATION_EMPTY) ||
+                (failures ? VALIDATION_CONTENT : undefined);
+
+              observer.next(
+                createResult({
+                  content,
+                  error: asyncError,
+                  isEmpty,
+                  isPending: !isEmpty && !!pendings,
+                  value,
+                }),
+              );
             }
-
-            content = {
-              ...content,
-              [name]: {
-                ...asyncResult,
-                field,
-              },
-            };
-
-            const asyncError =
-              (isEmpty && !allowEmpty && VALIDATION_EMPTY) ||
-              (failures ? VALIDATION_CONTENT : undefined);
-
-            observer.next({
-              content,
-              error: asyncError,
-              isEmpty,
-              isPending: !isEmpty && !!pendings,
-              isValid: !asyncError,
-              value,
-            });
           },
           complete: () => {
-            if (!pendings) {
+            if (!pendings && fieldResult.isPending) {
               observer.complete();
             }
           },
@@ -111,7 +116,7 @@ const createCopperSet = copr => {
       }
 
       value[name] = fieldResult.value;
-      acc[name] = { ...fieldResult, field };
+      acc[name] = fieldResult; // SEEEEEEEE
 
       return acc;
     }, {});
@@ -120,19 +125,29 @@ const createCopperSet = copr => {
       (isEmpty && !allowEmpty && VALIDATION_EMPTY) ||
       (failures ? VALIDATION_CONTENT : undefined);
 
-    result = {
+    result = createResult({
       content,
       error,
       isEmpty,
       isPending: !isEmpty && !!pendings,
-      isValid: !error,
       value,
-    };
+    });
 
     return result;
   };
 
-  return {
+  const createResult = ({ content, error, isEmpty, isPending, value }) => ({
+    content,
+    error,
+    isEmpty,
+    isPending,
+    isValid: !error,
+    node: setCopr,
+    nodeType: 'set',
+    value,
+  });
+
+  const setCopr = {
     allowEmpty,
     fields,
     getValue,
@@ -140,6 +155,8 @@ const createCopperSet = copr => {
     parse,
     validate,
   };
+
+  return setCopr;
 };
 
 export default createCopperSet;

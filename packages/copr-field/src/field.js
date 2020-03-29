@@ -10,7 +10,7 @@ import {
 } from './errors';
 
 import { observerFromOption } from './observer';
-import { runPreparedRuleList, prepareRuleList } from './rules';
+import { runRuleList, prepareRuleList } from './rules';
 import { isEmptyValue } from './type';
 
 const createCopperField = copr => {
@@ -67,14 +67,13 @@ const createCopperField = copr => {
     let value;
 
     if (isEmptyValue(input)) {
-      const result = {
+      const result = createResult({
         content: [],
         error: allowEmpty ? undefined : VALIDATION_EMPTY,
         isEmpty: true,
         isPending: false,
-        isValid: allowEmpty,
         value: undefined,
-      };
+      });
 
       Promise.resolve().then(() => {
         observer.next(result);
@@ -87,14 +86,13 @@ const createCopperField = copr => {
     try {
       value = parse(input);
     } catch (e) {
-      const result = {
+      const result = createResult({
         content: [],
         error: VALIDATION_TYPE,
         isEmpty: false,
         isPending: false,
-        isValid: false,
         value: undefined,
-      };
+      });
 
       Promise.resolve().then(() => {
         observer.next(result);
@@ -108,40 +106,51 @@ const createCopperField = copr => {
 
     Promise.resolve().then(() => {
       observer.next(result);
+      if (!result.isPending) {
+        observer.complete();
+      }
     });
 
-    const { content, isPending, isValid } = runPreparedRuleList(
-      value,
-      rules,
-      context,
-      {
-        ...observer,
-        next: asyncResult => {
-          observer.next({
-            content: asyncResult.content,
-            error: !asyncResult.isValid ? VALIDATION_RULE : undefined,
-            isEmpty: false,
-            isPending: asyncResult.isPending,
-            isValid: asyncResult.isValid,
-            value,
-          });
-        },
+    const { content, isPending, isValid } = runRuleList(value, rules, context, {
+      ...observer,
+      next: asyncResult => {
+        if (result.isPending) {
+          observer.next(
+            createResult({
+              content: asyncResult.content,
+              error: !asyncResult.isValid ? VALIDATION_RULE : undefined,
+              isEmpty: false,
+              isPending: asyncResult.isPending,
+              value,
+            }),
+          );
+        }
       },
-    );
+    });
 
-    result = {
+    result = createResult({
       content,
       error: !isValid ? VALIDATION_RULE : undefined,
       isEmpty: false,
       isPending,
-      isValid,
       value,
-    };
+    });
 
     return result;
   };
 
-  return {
+  const createResult = ({ content, error, isEmpty, isPending, value }) => ({
+    content,
+    error,
+    isEmpty,
+    isPending,
+    isValid: !error,
+    node: fieldCopr,
+    nodeType: 'field',
+    value,
+  });
+
+  const fieldCopr = {
     allowEmpty,
     getValue,
     meta,
@@ -150,6 +159,8 @@ const createCopperField = copr => {
     type,
     validate,
   };
+
+  return fieldCopr;
 };
 
 export default createCopperField;

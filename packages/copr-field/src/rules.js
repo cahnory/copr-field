@@ -2,152 +2,183 @@ import {
   INVALIDE_RULE,
   INVALIDE_RULE_ARGS,
   INVALIDE_RULE_META,
+  INVALIDE_RULE_OPERATOR,
   INVALIDE_RULE_TEST,
+  INVALIDE_TEST_RETURN,
+  VALIDATION_RULE,
 } from './errors';
 
 export const forceRuleList = rule => (!Array.isArray(rule) ? [rule] : rule);
 
-export const prepareRuleList = rules =>
-  forceRuleList(rules).map(rule => prepareRule(rule));
-
 export const prepareRule = rule => {
   if (typeof rule === 'function') {
-    return prepareRule({ test: rule });
+    return prepareTest({ test: rule });
   }
 
   if (!rule || typeof rule !== 'object' || Array.isArray(rule)) {
     throw new Error(INVALIDE_RULE);
   }
 
-  const { test, meta = {} } = rule;
-  let getArgs;
-  const { args: fixedArgs = [], getArgs: unsafeGetArgs } = rule;
+  return typeof rule.test === 'function'
+    ? prepareTest(rule)
+    : prepareLogic(rule);
+};
 
+export const prepareRuleList = rules => forceRuleList(rules).map(prepareRule);
+
+export const prepareLogic = rule => {
+  const logicRule = {
+    meta: prepareRuleMeta(rule.meta),
+    operator: prepareLogicOperator(rule.operator),
+    rules: [].concat(rule.rules).map(prepareRule),
+  };
+  logicRule.validate = (value, context, observer) =>
+    runLogicRule(logicRule, value, context, observer);
+
+  return logicRule;
+};
+
+export const prepareTest = rule => {
+  const test = {
+    getArgs: prepareRuleGetArgs(rule.getArgs || rule.args),
+    meta: prepareRuleMeta(rule.meta),
+    test: prepareRuleTest(rule.test),
+  };
+  test.validate = (value, context, observer) =>
+    runTestRule(test, value, context, observer);
+
+  return test;
+};
+
+export const prepareRuleGetArgs = (args = () => []) => {
+  if (typeof args === 'function') {
+    return args;
+  }
+
+  if (!Array.isArray(args)) {
+    throw new Error(INVALIDE_RULE_ARGS);
+  }
+
+  return () => args;
+};
+
+export const prepareRuleMeta = (meta = {}) => {
   if (!meta || typeof meta !== 'object' || Array.isArray(meta)) {
     throw new Error(INVALIDE_RULE_META);
   }
 
-  if (rule.all) {
-    return {
-      all: prepareRuleList(rule.all, meta),
-      meta,
-    };
-  }
+  return meta;
+};
 
-  if (rule.not) {
-    return { not: prepareRuleList(rule.not), meta };
-  }
-
-  if (rule.oneOf) {
-    return { oneOf: prepareRuleList(rule.oneOf), meta };
-  }
-
+export const prepareRuleTest = test => {
   if (typeof test !== 'function') {
     throw new Error(INVALIDE_RULE_TEST);
   }
 
-  if (!Array.isArray(fixedArgs)) {
-    throw new Error(INVALIDE_RULE_ARGS);
-  }
-
-  if (typeof unsafeGetArgs !== 'function') {
-    getArgs = () => fixedArgs;
-  } else {
-    getArgs = context => {
-      const args = unsafeGetArgs(context);
-
-      if (!Array.isArray(args)) {
-        throw new Error(INVALIDE_RULE_ARGS);
-      }
-
-      return args;
-    };
-  }
-
-  return { test, getArgs, meta };
+  return test;
 };
 
-export const runPreparedRuleList = (value, ruleList, context, observer) =>
-  subResultsToRuleListResult(
-    collectSubResults(value, ruleList, context, {
-      next: result => observer.next(subResultsToRuleListResult(result)),
+export const prepareLogicOperator = operator => {
+  if (typeof operator === 'function') {
+    return operator;
+  }
+
+  if (operator) {
+    throw new Error(INVALIDE_RULE_OPERATOR);
+  }
+
+  return allOperator;
+};
+
+export const runRuleList = (value, ruleList, context, observer) => {
+  const results = collectRuleResults(value, ruleList, context, {
+    next: nextResult =>
+      observer.next({
+        content: nextResult.content,
+        ...allOperator(nextResult),
+      }),
+    complete: observer.complete,
+  });
+
+  return {
+    content: results.content,
+    ...allOperator(results),
+  };
+};
+
+export const runLogicRule = (rule, value, context, observer) =>
+  runLogicOperator(
+    rule,
+    value,
+    collectRuleResults(value, rule.rules, context, {
+      next: nextResult =>
+        observer.next(runLogicOperator(rule, value, nextResult)),
       complete: observer.complete,
     }),
   );
 
-export const runPreparedRule = (value, rule, context, observer) => {
-  if (rule.all) {
-    return runPreparedRuleIntersection(value, rule, context, observer);
-  }
-  if (rule.not) {
-    return runPreparedRuleNot(value, rule, context, observer);
-  }
-  if (rule.oneOf) {
-    return runPreparedRuleUnion(value, rule, context, observer);
-  }
-  const testResult = rule.test(value, ...rule.getArgs(context));
-
-  let isValid = testResult;
-  const isPending = typeof testResult !== 'boolean';
+export const runTestRule = (rule, value, context, observer) => {
+  const isValid = rule.test(value, ...rule.getArgs(context));
+  const isPending = typeof isValid !== 'boolean';
 
   if (isPending) {
-    isValid = false;
-    Promise.resolve(testResult).then(asyncPass => {
+    Promise.resolve(isValid).then(asyncPass => {
+      const passIsValid = typeof asyncPass === 'boolean';
       observer.next({
         content: [],
+        error: asyncPass ? undefined : VALIDATION_RULE,
+        isEmpty: false,
         isPending: false,
-        isValid: asyncPass,
-        rule,
+        isValid: passIsValid && asyncPass,
+        node: rule,
+        nodeType: 'test',
         value,
       });
       observer.complete();
+
+      if (!passIsValid) {
+        throw new Error(INVALIDE_TEST_RETURN);
+      }
     });
   }
 
   return {
     content: [],
+    error: !isPending && isValid ? undefined : VALIDATION_RULE,
+    isEmpty: false,
     isPending,
-    isValid,
-    rule,
+    isValid: !isPending && isValid,
+    node: rule,
+    nodeType: 'test',
+    value,
   };
 };
 
-export const runPreparedRuleIntersection = (value, rule, context, observer) =>
-  subResultsToRuleIntersectionResult(
-    rule,
-    collectSubResults(value, rule.all, context, {
-      next: result => subResultsToRuleIntersectionResult(rule, result),
-      complete: observer.complete,
-    }),
-  );
+export const runLogicOperator = (logic, value, result) => {
+  const { isPending, isValid } = logic.operator(result);
 
-export const runPreparedRuleNot = (value, rule, context, observer) =>
-  subResultsToRuleNotResult(
-    rule,
-    collectSubResults(value, rule.not, context, {
-      next: result => subResultsToRuleNotResult(rule, result),
-      complete: observer.complete,
-    }),
-  );
+  return {
+    content: result.content,
+    error: isValid ? undefined : VALIDATION_RULE,
+    isEmpty: false,
+    isPending,
+    isValid,
+    node: logic,
+    nodeType: 'logic',
+    value,
+  };
+};
 
-export const runPreparedRuleUnion = (value, rule, context, observer) =>
-  subResultsToRuleUnionResult(
-    rule,
-    collectSubResults(value, rule.oneOf, context, {
-      next: result => subResultsToRuleUnionResult(rule, result),
-      complete: observer.complete,
-    }),
-  );
-
-export const collectSubResults = (value, rules, context, observer) => {
+export const collectRuleResults = (value, rules, context, observer) => {
   let pendings = 0;
   let result = rules.reduce(
     (acc, rule, index) => {
-      const subResult = runPreparedRule(value, rule, context, {
+      const subObserver = {
         next: asyncSubResult => {
           if (subResult.isPending && !asyncSubResult.isPending) {
             pendings -= 1;
           }
+
           result = {
             failures: result.failures - (asyncSubResult.isValid ? 1 : 0),
             passes: result.passes + (asyncSubResult.isValid ? 1 : 0),
@@ -164,7 +195,8 @@ export const collectSubResults = (value, rules, context, observer) => {
             observer.complete();
           }
         },
-      });
+      };
+      const subResult = rule.validate(value, context, subObserver);
 
       if (subResult.isPending) {
         acc.isPending = true;
@@ -182,28 +214,35 @@ export const collectSubResults = (value, rules, context, observer) => {
   return result;
 };
 
-export const subResultsToRuleListResult = ({
+export const allOperator = ({ isPending, failures }) => ({
   isPending,
-  failures,
-  content,
-}) => ({ content, isPending, isValid: !failures });
-
-export const subResultsToRuleIntersectionResult = (
-  rule,
-  { isPending, failures, content },
-) => ({ content, isPending, isValid: !failures, rule });
-
-export const subResultsToRuleNotResult = (
-  rule,
-  { isPending, failures, content },
-) => ({ content, isPending, isValid: !!failures, rule });
-
-export const subResultsToRuleUnionResult = (
-  rule,
-  { isPending, passes, content },
-) => ({
-  content,
-  isPending,
-  isValid: !!passes,
-  rule,
+  isValid: !failures,
 });
+
+export const notOperator = ({ isPending, failures }) => ({
+  isPending,
+  isValid: !!failures,
+});
+
+export const oneOfOperator = ({ isPending, passes }) => ({
+  isPending: !!passes || isPending,
+  isValid: !!passes,
+});
+
+export const all = allRule =>
+  prepareLogic({
+    ...allRule,
+    operator: allOperator,
+  });
+
+export const not = notRule =>
+  prepareLogic({
+    ...notRule,
+    operator: notOperator,
+  });
+
+export const oneOf = oneOfRule =>
+  prepareLogic({
+    ...oneOfRule,
+    operator: oneOfOperator,
+  });
