@@ -9,6 +9,7 @@ import {
   VALIDATION_TYPE,
 } from './errors';
 
+import { observerFromOption } from './observer';
 import { runPreparedRuleList, prepareRuleList } from './rules';
 import { isEmptyValue } from './type';
 
@@ -61,24 +62,28 @@ const createCopperField = copper => {
     }
   };
 
-  const validate = (value, context) => {
+  const validate = (value, { context, observer: observerOption } = {}) => {
+    const observer = observerFromOption(observerOption);
     if (isEmptyValue(value)) {
+      setTimeout(observer.complete);
       return createResult({
         isEmpty: true,
         error: allowEmpty ? undefined : VALIDATION_EMPTY,
       });
     }
 
-    const { content, pass } = runPreparedRuleList(value, rules, context);
-
-    if (!pass) {
-      return createResult({ value, content, error: VALIDATION_RULE });
-    }
-
-    return createResult({ value, content });
+    return ruleListToValidateResult(
+      value,
+      runPreparedRuleList(value, rules, context, {
+        ...observer,
+        next: result => {
+          observer.next(ruleListToValidateResult(value, result));
+        },
+      }),
+    );
   };
 
-  const process = (input, context) => {
+  const process = (input, { context, observer } = {}) => {
     let value;
 
     try {
@@ -87,7 +92,7 @@ const createCopperField = copper => {
       return createResult({ error: VALIDATION_TYPE });
     }
 
-    return validate(value, context);
+    return validate(value, { context, observer });
   };
 
   return {
@@ -103,6 +108,14 @@ const createCopperField = copper => {
 };
 
 export default createCopperField;
+
+export const ruleListToValidateResult = (value, { content, pass }) => {
+  if (!pass) {
+    return createResult({ value, content, error: VALIDATION_RULE });
+  }
+
+  return createResult({ value, content });
+};
 
 export const createResult = ({
   content = [],

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import CoprContext from './CoprContext';
 
@@ -11,6 +11,21 @@ const CoprForm = ({
   onUpdate,
   value: controlledInput,
 }) => {
+  const mounted = useRef(true);
+  const observer = useRef();
+  const getNewObserver = useCallback(() => {
+    const newObserver = {
+      next: nextResult => {
+        if (mounted.current && newObserver === observer.current) {
+          setResult(nextResult);
+        }
+      },
+    };
+    observer.current = newObserver;
+
+    return newObserver;
+  }, []);
+
   const [input, setInput] = useState(() => {
     if (controlledInput !== null) {
       return controlledInput;
@@ -24,15 +39,28 @@ const CoprForm = ({
   });
   const [value, setValue] = useState(() => copr.getValue(input));
   const [result, setResult] = useState(() =>
-    copr.process(value, { value, ...context }),
+    copr.process(value, {
+      context: { value, ...context },
+      observer: getNewObserver(),
+    }),
+  );
+
+  useEffect(
+    () => () => {
+      mounted.current = false;
+    },
+    [],
   );
 
   useEffect(() => {
     if (controlledInput !== null) {
       const nextValue = copr.getValue(controlledInput);
       const nextResult = copr.process(nextValue, {
-        value: nextValue,
-        ...context,
+        context: {
+          value: nextValue,
+          ...context,
+        },
+        observer: getNewObserver(),
       });
       setInput(controlledInput);
       setValue(nextValue);
@@ -46,14 +74,17 @@ const CoprForm = ({
         });
       }
     }
-  }, [context, controlledInput, copr, onUpdate]);
+  }, [context, controlledInput, copr, getNewObserver, onUpdate]);
 
   const handleValue = useCallback(
     nextInput => {
       const nextValue = copr.getValue(nextInput);
       const nextResult = copr.process(nextValue, {
-        value: nextValue,
-        ...context,
+        context: {
+          value: nextValue,
+          ...context,
+        },
+        observer: getNewObserver(),
       });
       setInput(nextInput);
       setValue(nextValue);
@@ -63,7 +94,7 @@ const CoprForm = ({
         onChange({ value: nextValue, input: nextInput, result: nextResult });
       }
     },
-    [context, copr, onChange],
+    [context, copr, getNewObserver, onChange],
   );
 
   const form = { copr, setValue: handleValue, result, path: [], value: input };

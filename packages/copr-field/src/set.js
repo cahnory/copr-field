@@ -1,5 +1,7 @@
 import { VALIDATION_TYPE } from './errors';
 
+import { observerFromOption } from './observer';
+
 const createCopperSet = ({ fields, meta = {} }) => {
   const formEntries = Object.entries(fields);
 
@@ -28,41 +30,58 @@ const createCopperSet = ({ fields, meta = {} }) => {
     }, {});
   };
 
-  const validate = (values, context) => {
-    let pass = true;
+  const runMethod = (
+    methodName,
+    value,
+    { context, observer: observerOption } = {},
+  ) => {
+    let failures = 0;
+    let observed = formEntries.length;
+    const observer = observerFromOption(observerOption);
 
-    const content = formEntries.reduce((acc, [name, field]) => {
-      const result = field.validate(values[name], context);
+    let content = formEntries.reduce((acc, [name, field]) => {
+      const fieldResult = field[methodName](value[name], {
+        context,
+        observer: {
+          next: result => {
+            if (result.pass) {
+              failures -= 1;
+            }
 
-      if (!result.pass) {
-        pass = false;
+            content = {
+              ...content,
+              [name]: {
+                ...result,
+                field,
+              },
+            };
+
+            observed -= 1;
+            observer.next({ padd: !failures, content });
+          },
+          complete: () => {
+            if (!observed) {
+              observer.complete();
+            }
+          },
+        },
+      });
+
+      if (!fieldResult.pass) {
+        failures += 1;
       }
 
-      acc[name] = { ...result, field };
+      acc[name] = { ...fieldResult, field };
 
       return acc;
     }, {});
 
-    return { pass, content };
+    return { pass: !failures, content };
   };
 
-  const process = (inputs, context) => {
-    let pass = true;
+  const validate = (value, options) => runMethod('validate', value, options);
 
-    const content = formEntries.reduce((acc, [name, field]) => {
-      const result = field.process(inputs[name], context);
-
-      if (!result.pass) {
-        pass = false;
-      }
-
-      acc[name] = { ...result, field };
-
-      return acc;
-    }, {});
-
-    return { pass, content };
-  };
+  const process = (value, options) => runMethod('process', value, options);
 
   return {
     fields,

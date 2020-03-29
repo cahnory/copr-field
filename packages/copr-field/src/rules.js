@@ -67,56 +67,142 @@ export const prepareRule = rule => {
   return { test, getArgs, meta };
 };
 
-export const runPreparedRuleList = (value, ruleList, context) => {
-  const { failures, content } = collectSubResults(value, ruleList, context);
+export const runPreparedRuleList = (value, ruleList, context, observer) =>
+  subResultsToRuleListResult(
+    collectSubResults(value, ruleList, context, {
+      next: result => observer.next(subResultsToRuleListResult(result)),
+      complete: observer.complete,
+    }),
+  );
 
-  return { pass: !failures, content };
-};
-
-export const runPreparedRule = (value, rule, context) => {
+export const runPreparedRule = (value, rule, context, observer) => {
   if (rule.all) {
-    return runPreparedRuleIntersection(value, rule, context);
+    return runPreparedRuleIntersection(value, rule, context, observer);
   }
   if (rule.not) {
-    return runPreparedRuleNot(value, rule, context);
+    return runPreparedRuleNot(value, rule, context, observer);
   }
   if (rule.oneOf) {
-    return runPreparedRuleUnion(value, rule, context);
+    return runPreparedRuleUnion(value, rule, context, observer);
   }
+  const testResult = rule.test(value, ...rule.getArgs(context));
+
+  let pass = testResult;
+  const isPending = typeof testResult !== 'boolean';
+
+  if (isPending) {
+    pass = false;
+    Promise.resolve(testResult).then(asyncPass => {
+      observer.next({
+        content: [],
+        isPending: false,
+        pass: asyncPass,
+        rule,
+      });
+      observer.complete();
+    });
+  }
+
   return {
-    pass: rule.test(value, ...rule.getArgs(context)),
-    rule,
     content: [],
+    isPending,
+    pass,
+    rule,
   };
 };
 
-export const runPreparedRuleIntersection = (value, rule, context) => {
-  const { failures, content } = collectSubResults(value, rule.all, context);
+export const runPreparedRuleIntersection = (value, rule, context, observer) =>
+  subResultsToRuleIntersectionResult(
+    rule,
+    collectSubResults(value, rule.all, context, {
+      next: result => subResultsToRuleIntersectionResult(rule, result),
+      complete: observer.complete,
+    }),
+  );
 
-  return { pass: !failures, rule, content };
-};
+export const runPreparedRuleNot = (value, rule, context, observer) =>
+  subResultsToRuleNotResult(
+    rule,
+    collectSubResults(value, rule.not, context, {
+      next: result => subResultsToRuleNotResult(rule, result),
+      complete: observer.complete,
+    }),
+  );
 
-export const runPreparedRuleNot = (value, rule, context) => {
-  const { failures, content } = collectSubResults(value, rule.not, context);
+export const runPreparedRuleUnion = (value, rule, context, observer) =>
+  subResultsToRuleUnionResult(
+    rule,
+    collectSubResults(value, rule.oneOf, context, {
+      next: result => subResultsToRuleUnionResult(rule, result),
+      complete: observer.complete,
+    }),
+  );
 
-  return { pass: !!failures, rule, content };
-};
+export const collectSubResults = (value, rules, context, observer) => {
+  let pendings = 0;
+  let result = rules.reduce(
+    (acc, rule, index) => {
+      const subResult = runPreparedRule(value, rule, context, {
+        next: asyncSubResult => {
+          if (!asyncSubResult.isPending) {
+            pendings -= 1;
+          }
+          result = {
+            failures: result.failures - (asyncSubResult.pass ? 1 : 0),
+            passes: result.passes + (asyncSubResult.pass ? 1 : 0),
+            isPending: !!pendings,
+            content: result.content
+              .slice(0, index)
+              .concat(asyncSubResult)
+              .concat(result.content.slice(index + 1)),
+          };
+          observer.next(result);
+        },
+        complete: () => {
+          if (!pendings) {
+            observer.complete();
+          }
+        },
+      });
 
-export const runPreparedRuleUnion = (value, rule, context) => {
-  const { passes, content } = collectSubResults(value, rule.oneOf, context);
+      if (subResult.isPending) {
+        acc.isPending = true;
+        pendings += 1;
+      }
 
-  return { pass: !!passes, rule, content };
-};
-
-export const collectSubResults = (value, rules, context) =>
-  rules.reduce(
-    (acc, rule) => {
-      const result = runPreparedRule(value, rule, context);
-
-      acc[result.pass ? 'passes' : 'failures'] += 1;
-      acc.content.push(result);
+      acc[subResult.pass ? 'passes' : 'failures'] += 1;
+      acc.content.push(subResult);
 
       return acc;
     },
-    { failures: 0, passes: 0, content: [] },
+    { failures: 0, passes: 0, isPending: false, content: [] },
   );
+
+  return result;
+};
+
+export const subResultsToRuleListResult = ({
+  isPending,
+  failures,
+  content,
+}) => ({ content, isPending, pass: !failures });
+
+export const subResultsToRuleIntersectionResult = (
+  rule,
+  { isPending, failures, content },
+) => ({ content, isPending, pass: !failures, rule });
+
+export const subResultsToRuleNotResult = (
+  rule,
+  { isPending, failures, content },
+) => ({ content, isPending, pass: !!failures, rule });
+
+export const subResultsToRuleUnionResult = (
+  rule,
+  { isPending, passes, content },
+) => ({
+  content,
+  isPending,
+  pass: !!passes,
+  rule,
+});
