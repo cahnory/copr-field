@@ -1,9 +1,9 @@
 import {
-  INVALIDE_COPPER,
-  INVALIDE_COPPER_ALLOW_EMPTY,
-  INVALIDE_COPPER_META,
-  INVALIDE_COPPER_RULES,
-  INVALIDE_COPPER_TYPE,
+  INVALIDE_COPR,
+  INVALIDE_COPR_ALLOW_EMPTY,
+  INVALIDE_COPR_META,
+  INVALIDE_COPR_RULES,
+  INVALIDE_COPR_TYPE,
   VALIDATION_EMPTY,
   VALIDATION_RULE,
   VALIDATION_TYPE,
@@ -13,23 +13,23 @@ import { observerFromOption } from './observer';
 import { runPreparedRuleList, prepareRuleList } from './rules';
 import { isEmptyValue } from './type';
 
-const createCopperField = copper => {
-  if (typeof copper !== 'object') {
-    throw new Error(INVALIDE_COPPER);
+const createCopperField = copr => {
+  if (typeof copr !== 'object') {
+    throw new Error(INVALIDE_COPR);
   }
 
-  const { type, meta = {}, rules: ruleList = [], allowEmpty = false } = copper;
+  const { allowEmpty = false, meta = {}, rules: ruleList = [], type } = copr;
 
   if (!Array.isArray(ruleList)) {
-    throw new Error(INVALIDE_COPPER_RULES);
+    throw new Error(INVALIDE_COPR_RULES);
   }
 
   if (typeof allowEmpty !== 'boolean') {
-    throw new Error(INVALIDE_COPPER_ALLOW_EMPTY);
+    throw new Error(INVALIDE_COPR_ALLOW_EMPTY);
   }
 
   if (typeof meta !== 'object') {
-    throw new Error(INVALIDE_COPPER_META);
+    throw new Error(INVALIDE_COPR_META);
   }
 
   if (
@@ -37,7 +37,7 @@ const createCopperField = copper => {
     typeof type.parse !== 'function' ||
     typeof type.validate !== 'function'
   ) {
-    throw new Error(INVALIDE_COPPER_TYPE);
+    throw new Error(INVALIDE_COPR_TYPE);
   }
 
   const rules = prepareRuleList(ruleList);
