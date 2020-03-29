@@ -43,19 +43,30 @@ const createCopperSet = copr => {
 
   const validate = (input, { context, observer: observerOption } = {}) => {
     let failures = 0;
-    let observed = formEntries.length;
+    let pendings = 0;
     let isEmpty = true;
-    let error;
+    let result;
     const value = {};
     const observer = observerFromOption(observerOption);
+
+    Promise.resolve(() => {
+      observer.next(result);
+      if (!formEntries.length) {
+        observer.complete();
+      }
+    });
 
     let content = formEntries.reduce((acc, [name, field]) => {
       const fieldResult = field.validate(input[name], {
         context,
         observer: {
           next: asyncResult => {
-            if (asyncResult.pass) {
-              failures -= 1;
+            if (fieldResult.isPending && !asyncResult.isPending) {
+              if (asyncResult.pass) {
+                failures -= 1;
+              }
+
+              pendings -= 1;
             }
 
             content = {
@@ -66,17 +77,21 @@ const createCopperSet = copr => {
               },
             };
 
-            observed -= 1;
+            const asyncError =
+              (isEmpty && !allowEmpty && VALIDATION_EMPTY) ||
+              (failures ? VALIDATION_CONTENT : undefined);
+
             observer.next({
               content,
-              error: error || (failures ? VALIDATION_CONTENT : undefined),
+              error: asyncError,
               isEmpty,
-              pass: !failures,
+              isPending: !isEmpty && !!pendings,
+              pass: !asyncError,
               value,
             });
           },
           complete: () => {
-            if (!observed) {
+            if (!pendings) {
               observer.complete();
             }
           },
@@ -91,29 +106,37 @@ const createCopperSet = copr => {
         isEmpty = false;
       }
 
+      if (fieldResult.isPending) {
+        pendings += 1;
+      }
+
       value[name] = fieldResult.value;
       acc[name] = { ...fieldResult, field };
 
       return acc;
     }, {});
 
-    if (isEmpty && !allowEmpty) {
-      error = VALIDATION_EMPTY;
-    }
+    const error =
+      (isEmpty && !allowEmpty && VALIDATION_EMPTY) ||
+      (failures ? VALIDATION_CONTENT : undefined);
 
-    return {
+    result = {
       content,
-      error: error || (failures ? VALIDATION_CONTENT : undefined),
+      error,
       isEmpty,
-      pass: !failures,
+      isPending: !isEmpty && !!pendings,
+      pass: !error,
       value,
     };
+
+    return result;
   };
 
   return {
+    allowEmpty,
     fields,
-    meta,
     getValue,
+    meta,
     parse,
     validate,
   };

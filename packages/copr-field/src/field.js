@@ -63,58 +63,93 @@ const createCopperField = copr => {
   };
 
   const validate = (input, { context, observer: observerOption } = {}) => {
+    const observer = observerFromOption(observerOption);
     let value;
+
+    if (isEmptyValue(input)) {
+      const result = {
+        content: [],
+        error: allowEmpty ? undefined : VALIDATION_EMPTY,
+        isEmpty: true,
+        isPending: false,
+        pass: allowEmpty,
+        value: undefined,
+      };
+
+      Promise.resolve().then(() => {
+        observer.next(result);
+        observer.complete();
+      });
+
+      return result;
+    }
 
     try {
       value = parse(input);
     } catch (e) {
-      return createResult({ error: VALIDATION_TYPE });
-    }
+      const result = {
+        content: [],
+        error: VALIDATION_TYPE,
+        isEmpty: false,
+        isPending: false,
+        pass: false,
+        value: undefined,
+      };
 
-    const observer = observerFromOption(observerOption);
-    if (isEmptyValue(value)) {
-      setTimeout(observer.complete);
-      return createResult({
-        isEmpty: true,
-        error: allowEmpty ? undefined : VALIDATION_EMPTY,
+      Promise.resolve().then(() => {
+        observer.next(result);
+        observer.complete();
       });
+
+      return result;
     }
 
-    return ruleListToValidateResult(
+    let result;
+
+    Promise.resolve().then(() => {
+      observer.next(result);
+    });
+
+    const { content, isPending, pass } = runPreparedRuleList(
       value,
-      runPreparedRuleList(value, rules, context, {
+      rules,
+      context,
+      {
         ...observer,
-        next: result => {
-          observer.next(ruleListToValidateResult(value, result));
+        next: asyncResult => {
+          observer.next({
+            content: asyncResult.content,
+            error: !asyncResult.pass ? VALIDATION_RULE : undefined,
+            isEmpty: false,
+            isPending: asyncResult.isPending,
+            pass: asyncResult.pass,
+            value,
+          });
         },
-      }),
+      },
     );
+
+    result = {
+      content,
+      error: !pass ? VALIDATION_RULE : undefined,
+      isEmpty: false,
+      isPending,
+      pass,
+      value,
+    };
+
+    return result;
   };
 
   return {
     allowEmpty,
-    type,
-    meta,
-    rules,
     getValue,
+    meta,
     parse,
+    rules,
+    type,
     validate,
   };
 };
 
 export default createCopperField;
-
-export const ruleListToValidateResult = (value, { content, pass }) => {
-  if (!pass) {
-    return createResult({ value, content, error: VALIDATION_RULE });
-  }
-
-  return createResult({ value, content });
-};
-
-export const createResult = ({
-  content = [],
-  error,
-  isEmpty = false,
-  value,
-}) => ({ content, error, isEmpty, pass: !error, value });

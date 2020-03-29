@@ -14,11 +14,11 @@ const useCopr = (name = null) => {
     return context;
   }
 
-  if (typeof context.result.content !== 'object') {
+  if (typeof context.copr.fields !== 'object') {
     throw new Error(`Can't access field "${name}", current copr is not a set`);
   }
 
-  if (!context.result.content[name]) {
+  if (!context.copr.fields[name]) {
     throw new Error(`Can't access unknown field "${name}" on current copr`);
   }
 

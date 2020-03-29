@@ -98,6 +98,7 @@ export const runPreparedRule = (value, rule, context, observer) => {
         isPending: false,
         pass: asyncPass,
         rule,
+        value,
       });
       observer.complete();
     });
@@ -144,7 +145,7 @@ export const collectSubResults = (value, rules, context, observer) => {
     (acc, rule, index) => {
       const subResult = runPreparedRule(value, rule, context, {
         next: asyncSubResult => {
-          if (!asyncSubResult.isPending) {
+          if (subResult.isPending && !asyncSubResult.isPending) {
             pendings -= 1;
           }
           result = {
