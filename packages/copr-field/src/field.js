@@ -62,7 +62,15 @@ const createCopperField = copr => {
     }
   };
 
-  const validate = (value, { context, observer: observerOption } = {}) => {
+  const validate = (input, { context, observer: observerOption } = {}) => {
+    let value;
+
+    try {
+      value = parse(input);
+    } catch (e) {
+      return createResult({ error: VALIDATION_TYPE });
+    }
+
     const observer = observerFromOption(observerOption);
     if (isEmptyValue(value)) {
       setTimeout(observer.complete);
@@ -83,18 +91,6 @@ const createCopperField = copr => {
     );
   };
 
-  const process = (input, { context, observer } = {}) => {
-    let value;
-
-    try {
-      value = parse(input);
-    } catch (e) {
-      return createResult({ error: VALIDATION_TYPE });
-    }
-
-    return validate(value, { context, observer });
-  };
-
   return {
     allowEmpty,
     type,
@@ -103,7 +99,6 @@ const createCopperField = copr => {
     getValue,
     parse,
     validate,
-    process,
   };
 };
 

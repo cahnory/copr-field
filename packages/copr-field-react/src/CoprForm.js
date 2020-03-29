@@ -39,7 +39,7 @@ const CoprForm = ({
   });
   const [value, setValue] = useState(() => copr.getValue(input));
   const [result, setResult] = useState(() =>
-    copr.process(value, {
+    copr.validate(value, {
       context: { value, ...context },
       observer: getNewObserver(),
     }),
@@ -55,7 +55,7 @@ const CoprForm = ({
   useEffect(() => {
     if (controlledInput !== null) {
       const nextValue = copr.getValue(controlledInput);
-      const nextResult = copr.process(nextValue, {
+      const nextResult = copr.validate(nextValue, {
         context: {
           value: nextValue,
           ...context,
@@ -79,7 +79,7 @@ const CoprForm = ({
   const handleValue = useCallback(
     nextInput => {
       const nextValue = copr.getValue(nextInput);
-      const nextResult = copr.process(nextValue, {
+      const nextResult = copr.validate(nextValue, {
         context: {
           value: nextValue,
           ...context,

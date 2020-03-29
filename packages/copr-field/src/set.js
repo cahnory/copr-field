@@ -41,11 +41,7 @@ const createCopperSet = copr => {
     }, {});
   };
 
-  const runMethod = (
-    methodName,
-    input,
-    { context, observer: observerOption } = {},
-  ) => {
+  const validate = (input, { context, observer: observerOption } = {}) => {
     let failures = 0;
     let observed = formEntries.length;
     let isEmpty = true;
@@ -54,7 +50,7 @@ const createCopperSet = copr => {
     const observer = observerFromOption(observerOption);
 
     let content = formEntries.reduce((acc, [name, field]) => {
-      const fieldResult = field[methodName](input[name], {
+      const fieldResult = field.validate(input[name], {
         context,
         observer: {
           next: asyncResult => {
@@ -114,17 +110,12 @@ const createCopperSet = copr => {
     };
   };
 
-  const validate = (value, options) => runMethod('validate', value, options);
-
-  const process = (value, options) => runMethod('process', value, options);
-
   return {
     fields,
     meta,
     getValue,
     parse,
     validate,
-    process,
   };
 };
 
