@@ -87,16 +87,16 @@ export const runPreparedRule = (value, rule, context, observer) => {
   }
   const testResult = rule.test(value, ...rule.getArgs(context));
 
-  let pass = testResult;
+  let isValid = testResult;
   const isPending = typeof testResult !== 'boolean';
 
   if (isPending) {
-    pass = false;
+    isValid = false;
     Promise.resolve(testResult).then(asyncPass => {
       observer.next({
         content: [],
         isPending: false,
-        pass: asyncPass,
+        isValid: asyncPass,
         rule,
         value,
       });
@@ -107,7 +107,7 @@ export const runPreparedRule = (value, rule, context, observer) => {
   return {
     content: [],
     isPending,
-    pass,
+    isValid,
     rule,
   };
 };
@@ -149,8 +149,8 @@ export const collectSubResults = (value, rules, context, observer) => {
             pendings -= 1;
           }
           result = {
-            failures: result.failures - (asyncSubResult.pass ? 1 : 0),
-            passes: result.passes + (asyncSubResult.pass ? 1 : 0),
+            failures: result.failures - (asyncSubResult.isValid ? 1 : 0),
+            passes: result.passes + (asyncSubResult.isValid ? 1 : 0),
             isPending: !!pendings,
             content: result.content
               .slice(0, index)
@@ -171,7 +171,7 @@ export const collectSubResults = (value, rules, context, observer) => {
         pendings += 1;
       }
 
-      acc[subResult.pass ? 'passes' : 'failures'] += 1;
+      acc[subResult.isValid ? 'passes' : 'failures'] += 1;
       acc.content.push(subResult);
 
       return acc;
@@ -186,17 +186,17 @@ export const subResultsToRuleListResult = ({
   isPending,
   failures,
   content,
-}) => ({ content, isPending, pass: !failures });
+}) => ({ content, isPending, isValid: !failures });
 
 export const subResultsToRuleIntersectionResult = (
   rule,
   { isPending, failures, content },
-) => ({ content, isPending, pass: !failures, rule });
+) => ({ content, isPending, isValid: !failures, rule });
 
 export const subResultsToRuleNotResult = (
   rule,
   { isPending, failures, content },
-) => ({ content, isPending, pass: !!failures, rule });
+) => ({ content, isPending, isValid: !!failures, rule });
 
 export const subResultsToRuleUnionResult = (
   rule,
@@ -204,6 +204,6 @@ export const subResultsToRuleUnionResult = (
 ) => ({
   content,
   isPending,
-  pass: !!passes,
+  isValid: !!passes,
   rule,
 });

@@ -72,7 +72,7 @@ const createCopperField = copr => {
         error: allowEmpty ? undefined : VALIDATION_EMPTY,
         isEmpty: true,
         isPending: false,
-        pass: allowEmpty,
+        isValid: allowEmpty,
         value: undefined,
       };
 
@@ -92,7 +92,7 @@ const createCopperField = copr => {
         error: VALIDATION_TYPE,
         isEmpty: false,
         isPending: false,
-        pass: false,
+        isValid: false,
         value: undefined,
       };
 
@@ -110,7 +110,7 @@ const createCopperField = copr => {
       observer.next(result);
     });
 
-    const { content, isPending, pass } = runPreparedRuleList(
+    const { content, isPending, isValid } = runPreparedRuleList(
       value,
       rules,
       context,
@@ -119,10 +119,10 @@ const createCopperField = copr => {
         next: asyncResult => {
           observer.next({
             content: asyncResult.content,
-            error: !asyncResult.pass ? VALIDATION_RULE : undefined,
+            error: !asyncResult.isValid ? VALIDATION_RULE : undefined,
             isEmpty: false,
             isPending: asyncResult.isPending,
-            pass: asyncResult.pass,
+            isValid: asyncResult.isValid,
             value,
           });
         },
@@ -131,10 +131,10 @@ const createCopperField = copr => {
 
     result = {
       content,
-      error: !pass ? VALIDATION_RULE : undefined,
+      error: !isValid ? VALIDATION_RULE : undefined,
       isEmpty: false,
       isPending,
-      pass,
+      isValid,
       value,
     };
 

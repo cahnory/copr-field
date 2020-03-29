@@ -62,7 +62,7 @@ const createCopperSet = copr => {
         observer: {
           next: asyncResult => {
             if (fieldResult.isPending && !asyncResult.isPending) {
-              if (asyncResult.pass) {
+              if (asyncResult.isValid) {
                 failures -= 1;
               }
 
@@ -86,7 +86,7 @@ const createCopperSet = copr => {
               error: asyncError,
               isEmpty,
               isPending: !isEmpty && !!pendings,
-              pass: !asyncError,
+              isValid: !asyncError,
               value,
             });
           },
@@ -98,7 +98,7 @@ const createCopperSet = copr => {
         },
       });
 
-      if (!fieldResult.pass) {
+      if (!fieldResult.isValid) {
         failures += 1;
       }
 
@@ -125,7 +125,7 @@ const createCopperSet = copr => {
       error,
       isEmpty,
       isPending: !isEmpty && !!pendings,
-      pass: !error,
+      isValid: !error,
       value,
     };
 
