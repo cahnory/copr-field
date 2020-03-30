@@ -6,7 +6,7 @@ export default createType({
     Number.isFinite(1 + parseFloat(input, 10) && Number(input)),
 });
 
-export const isEqual = (value, sup) => value === sup;
+export const isEqual = (value, other) => value === other;
 
 export const isGreater = (value, inf) => value > inf;
 

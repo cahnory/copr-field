@@ -17,7 +17,7 @@ export const isAfter = (value, inf) => value > inf;
 
 export const isBefore = (value, sup) => value < sup;
 
-export const isEqual = (value, inf) => value.getTime() === inf.getTime();
+export const isEqual = (value, other) => value.getTime() === other.getTime();
 
 export const isSameDay = (value, other) =>
   isSameMonth(value, other) && isSameDayOfMonth(value, other);

@@ -14,4 +14,4 @@ export const createType = ({ parse, validate }) => {
 };
 
 export const isEmptyValue = input =>
-  input === '' || input === null || input === undefined || Number.isNaN(input);
+  input === '' || input === null || input === undefined;
