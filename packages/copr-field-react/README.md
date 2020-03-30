@@ -17,9 +17,7 @@ $ npm install copr-field --save
 
 ## Documentation
 
-- [Getting Started](documentation/getting-started.md)
-- [Guides](documentation/guides/README.md)
-- [API Reference](documentation/api/README.md)
+@TODO
 
 ## Contributors
 
