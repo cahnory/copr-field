@@ -20,7 +20,6 @@ describe('type.createType', () => {
 
     expect(type.validate()).toEqual(false);
     expect(type.validate('')).toEqual(false);
-    expect(type.validate(NaN)).toEqual(false);
     expect(type.validate(null)).toEqual(false);
     expect(type.validate(undefined)).toEqual(false);
     expect(validate).not.toHaveBeenCalled();

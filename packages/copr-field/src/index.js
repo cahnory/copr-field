@@ -3,7 +3,7 @@ export { default as createSet } from './set';
 export { all, not, oneOf } from './rules';
 
 export {
-  default as dateType,
+  default as DateType,
   isAfter as dateIsAfter,
   isBefore as dateIsBefore,
   isEqual as dateIsEqual,
@@ -16,7 +16,7 @@ export {
 } from './types/date';
 
 export {
-  default as numberType,
+  default as NumberType,
   isEqual as numberIsEqual,
   isGreater as numberIsGreater,
   isInteger as numberIsInteger,
@@ -27,7 +27,7 @@ export {
 } from './types/number';
 
 export {
-  default as stringType,
+  default as StringType,
   isEqual as stringIsEqual,
   isLonger as stringIsLonger,
   isMatching as stringIsMatching,

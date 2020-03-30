@@ -1,4 +1,4 @@
-import dateType, {
+import DateType, {
   isAfter,
   isBefore,
   isEqual,
@@ -10,50 +10,50 @@ import dateType, {
   isSameYear,
 } from '../date';
 
-describe('dateType.validate', () => {
+describe('DateType.validate', () => {
   it('handles dates expressed as number', () => {
-    expect(dateType.validate(-1)).toBe(true);
-    expect(dateType.validate(0)).toBe(true);
-    expect(dateType.validate(1)).toBe(true);
-    expect(dateType.validate(null)).toBe(false);
-    expect(dateType.validate(undefined)).toBe(false);
+    expect(DateType.validate(-1)).toBe(true);
+    expect(DateType.validate(0)).toBe(true);
+    expect(DateType.validate(1)).toBe(true);
+    expect(DateType.validate(null)).toBe(false);
+    expect(DateType.validate(undefined)).toBe(false);
   });
   it('handles dates expressed as number string', () => {
-    expect(dateType.validate('-1')).toBe(true);
-    expect(dateType.validate('0')).toBe(true);
-    expect(dateType.validate('1')).toBe(true);
+    expect(DateType.validate('-1')).toBe(true);
+    expect(DateType.validate('0')).toBe(true);
+    expect(DateType.validate('1')).toBe(true);
   });
   it('handles dates expressed as string', () => {
-    expect(dateType.validate('Tue Feb 12 1985 01:00:00 GMT+0100')).toBe(true);
-    expect(dateType.validate('Tue Feb 32 1985 01:00:00 GMT+0100')).toBe(false);
-    expect(dateType.validate('Tue, 12 Feb 1985 00:00:00 GMT')).toBe(true);
-    expect(dateType.validate('Tue, 32 Feb 1985 00:00:00 GMT')).toBe(false);
-    expect(dateType.validate('1985-02-12T00:00:00.000Z')).toBe(true);
-    expect(dateType.validate('1985-02-32T00:00:00.000Z')).toBe(false);
+    expect(DateType.validate('Tue Feb 12 1985 01:00:00 GMT+0100')).toBe(true);
+    expect(DateType.validate('Tue Feb 32 1985 01:00:00 GMT+0100')).toBe(false);
+    expect(DateType.validate('Tue, 12 Feb 1985 00:00:00 GMT')).toBe(true);
+    expect(DateType.validate('Tue, 32 Feb 1985 00:00:00 GMT')).toBe(false);
+    expect(DateType.validate('1985-02-12T00:00:00.000Z')).toBe(true);
+    expect(DateType.validate('1985-02-32T00:00:00.000Z')).toBe(false);
   });
   it('handles dates expressed as Date', () => {
-    expect(dateType.validate(new Date())).toBe(true);
-    expect(dateType.validate(new Date('1985-02-32T00:00:00.000Z'))).toBe(false);
+    expect(DateType.validate(new Date())).toBe(true);
+    expect(DateType.validate(new Date('1985-02-32T00:00:00.000Z'))).toBe(false);
   });
   it('rejects non date inputs', () => {
-    expect(dateType.validate('abc')).toBe(false);
-    expect(dateType.validate('')).toBe(false);
-    expect(dateType.validate(NaN)).toBe(false);
-    expect(dateType.validate(null)).toBe(false);
-    expect(dateType.validate(undefined)).toBe(false);
-    expect(dateType.validate(true)).toBe(false);
-    expect(dateType.validate(false)).toBe(false);
+    expect(DateType.validate('abc')).toBe(false);
+    expect(DateType.validate('')).toBe(false);
+    expect(DateType.validate(NaN)).toBe(false);
+    expect(DateType.validate(null)).toBe(false);
+    expect(DateType.validate(undefined)).toBe(false);
+    expect(DateType.validate(true)).toBe(false);
+    expect(DateType.validate(false)).toBe(false);
   });
 });
 
-describe('dateType.parse', () => {
+describe('DateType.parse', () => {
   const expectValid = (input, time) => {
-    const result = dateType.parse(input);
+    const result = DateType.parse(input);
     expect(result).toBeInstanceOf(Date);
     expect(result.getTime()).toEqual(time);
   };
   const expectInvalid = input => {
-    expect(dateType.parse(input)).toEqual(undefined);
+    expect(DateType.parse(input)).toEqual(undefined);
   };
 
   it('handles dates expressed as number', () => {

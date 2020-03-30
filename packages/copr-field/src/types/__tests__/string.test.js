@@ -1,32 +1,30 @@
-import stringType, { isEqual, isLonger, isShorter, isSized } from '../string';
+import StringType, { isEqual, isLonger, isShorter, isSized } from '../string';
 
-describe('stringType.validate', () => {
+describe('StringType.validate', () => {
   it('handles strings', () => {
-    expect(stringType.validate('0')).toBe(true);
+    expect(StringType.validate('0')).toBe(true);
+    expect(StringType.validate(0)).toBe(true);
   });
   it('rejects non string inputs', () => {
-    expect(stringType.validate('')).toBe(false);
-    expect(stringType.validate(123)).toBe(false);
-    expect(stringType.validate(NaN)).toBe(false);
-    expect(stringType.validate(null)).toBe(false);
-    expect(stringType.validate(undefined)).toBe(false);
-    expect(stringType.validate(true)).toBe(false);
-    expect(stringType.validate(false)).toBe(false);
+    expect(StringType.validate('')).toBe(false);
+    expect(StringType.validate(null)).toBe(false);
+    expect(StringType.validate(undefined)).toBe(false);
+    expect(StringType.validate(true)).toBe(false);
+    expect(StringType.validate(false)).toBe(false);
   });
 });
 
-describe('stringType.parse', () => {
+describe('StringType.parse', () => {
   it('handles strings', () => {
-    expect(stringType.parse('0')).toEqual('0');
+    expect(StringType.parse('0')).toEqual('0');
+    expect(StringType.parse(0)).toEqual('0');
   });
   it('returns undefined for non string inputs', () => {
-    expect(stringType.parse(0)).toEqual(undefined);
-    expect(stringType.parse('')).toEqual(undefined);
-    expect(stringType.parse(NaN)).toEqual(undefined);
-    expect(stringType.parse(null)).toEqual(undefined);
-    expect(stringType.parse(undefined)).toEqual(undefined);
-    expect(stringType.parse(true)).toEqual(undefined);
-    expect(stringType.parse(false)).toEqual(undefined);
+    expect(StringType.parse('')).toEqual(undefined);
+    expect(StringType.parse(null)).toEqual(undefined);
+    expect(StringType.parse(undefined)).toEqual(undefined);
+    expect(StringType.parse(true)).toEqual(undefined);
+    expect(StringType.parse(false)).toEqual(undefined);
   });
 });
 

@@ -1,4 +1,4 @@
-import { prepareRule } from '../rules';
+import { prepareRule, prepareTest } from '../rules';
 import {
   INVALIDE_RULE,
   INVALIDE_RULE_ARGS,
@@ -9,9 +9,10 @@ import {
 describe('prepareRule', () => {
   it('returns a prepared rule', () => {
     expect(prepareRule(() => {})).toEqual({
-      test: expect.any(Function),
-      meta: expect.any(Object),
       getArgs: expect.any(Function),
+      meta: expect.any(Object),
+      test: expect.any(Function),
+      validate: expect.any(Function),
     });
   });
 
@@ -49,14 +50,6 @@ describe('prepareRule', () => {
     expect(() => prepareRule({ oneOf: [13] })).toThrow(INVALIDE_RULE);
   });
 
-  it('throws with invalid test', () => {
-    expect(() => prepareRule({ test: undefined })).toThrow(INVALIDE_RULE_TEST);
-    expect(() => prepareRule({ test: null })).toThrow(INVALIDE_RULE_TEST);
-    expect(() => prepareRule({ test: {} })).toThrow(INVALIDE_RULE_TEST);
-    expect(() => prepareRule({ test: '*' })).toThrow(INVALIDE_RULE_TEST);
-    expect(() => prepareRule({ test: 13 })).toThrow(INVALIDE_RULE_TEST);
-  });
-
   it('throws with invalid meta', () => {
     const test = () => {};
     expect(() => prepareRule({ test, meta: null })).toThrow(INVALIDE_RULE_META);
@@ -71,6 +64,16 @@ describe('prepareRule', () => {
     expect(() => prepareRule({ test, args: {} })).toThrow(INVALIDE_RULE_ARGS);
     expect(() => prepareRule({ test, args: '*' })).toThrow(INVALIDE_RULE_ARGS);
     expect(() => prepareRule({ test, args: 13 })).toThrow(INVALIDE_RULE_ARGS);
+  });
+});
+
+describe('prepareTest', () => {
+  it('throws with invalid test', () => {
+    expect(() => prepareTest({ test: undefined })).toThrow(INVALIDE_RULE_TEST);
+    expect(() => prepareTest({ test: null })).toThrow(INVALIDE_RULE_TEST);
+    expect(() => prepareTest({ test: {} })).toThrow(INVALIDE_RULE_TEST);
+    expect(() => prepareTest({ test: '*' })).toThrow(INVALIDE_RULE_TEST);
+    expect(() => prepareTest({ test: 13 })).toThrow(INVALIDE_RULE_TEST);
   });
 });
 
