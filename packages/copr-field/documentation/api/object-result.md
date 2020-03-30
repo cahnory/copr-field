@@ -10,15 +10,15 @@ The `Result` object describes the validation state of a value.
   - [isEmpty](#isempty-boolean)
   - [isPending](#ispending-boolean)
   - [isValid](#isvalid-boolean)
-  - [node](#node-fieldrulesettest)
-  - [nodeType](#nodetype-field--rule--set--test)
+  - [node](#node-fieldrulesettestrule)
+  - [nodeType](#nodetype-field--logic--set--test)
   - [value](#value-any)
 
 ## Properties
 
 ### content: _`Result [] | { [ string ]: Result }`_
 
-The subresults. An `Object` if it’s the result of a [`Set`](object-copr-set.md), an `Array` if it’s the result of a [`Field`](copr-field-object.md), a [`Rule`](object-rule.md) or a [`Test`](test-object.md).
+The subresults. An `Object` if it’s the result of a [`Set`](object-copr-set.md), an `Array` if it’s the result of a [`Field`](object-copr-field.md), a [`LogicRule`](test-object-rule-test.md), or a [`TestRule`](test-object-rule-test.md).
 
 ### error: _`string`_
 
@@ -41,11 +41,11 @@ If the result of a [`Test`](test-object) is Pending. _[See "Async rules"](guides
 
 If the value is considered valid. `isValid` is true if `error` is `undefined` and `isPending` is false.
 
-### node: [_`Field`_](copr-field-object.md)_`|`_[_`Rule`_](object-rule.md)_`|`_[_`Set`_](object-copr-set.md)_`|`_[_`Test`_](test-object.md)
+### node: [_`Field`_](object-copr-field.md)_`|`_[_`Rule`_](object-rule.md)_`|`_[_`Set`_](object-copr-set.md)_`|`_[_`TestRule`_](object-rule-test.md)
 
 Node from which the result is output.
 
-### nodeType: _`'field' | 'rule' | 'set' | 'test'`_
+### nodeType: _`'field' | 'logic' | 'set' | 'test'`_
 
 The type of the node from which the result is output.
 
