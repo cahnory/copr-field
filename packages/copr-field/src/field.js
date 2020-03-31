@@ -62,7 +62,12 @@ const createCopperField = copr => {
     }
   };
 
-  const validate = (input, { context, observer: observerOption } = {}) => {
+  const validate = (
+    input,
+    { context, observer: observerOption } = {},
+    _root = fieldCopr,
+    _path = [],
+  ) => {
     const observer = observerFromOption(observerOption);
     let value;
 
@@ -111,22 +116,27 @@ const createCopperField = copr => {
       }
     });
 
-    const { content, isPending, isValid } = runRuleList(value, rules, context, {
-      ...observer,
-      next: asyncResult => {
-        if (result.isPending) {
-          observer.next(
-            createResult({
-              content: asyncResult.content,
-              error: !asyncResult.isValid ? VALIDATION_RULE : undefined,
-              isEmpty: false,
-              isPending: asyncResult.isPending,
-              value,
-            }),
-          );
-        }
+    const { content, isPending, isValid } = runRuleList(
+      value,
+      rules,
+      { context, field: fieldCopr, fieldPath: _path, root: _root },
+      {
+        ...observer,
+        next: asyncResult => {
+          if (result.isPending) {
+            observer.next(
+              createResult({
+                content: asyncResult.content,
+                error: !asyncResult.isValid ? VALIDATION_RULE : undefined,
+                isEmpty: false,
+                isPending: asyncResult.isPending,
+                value,
+              }),
+            );
+          }
+        },
       },
-    });
+    );
 
     result = createResult({
       content,

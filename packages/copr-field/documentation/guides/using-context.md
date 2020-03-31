@@ -21,7 +21,7 @@ const fieldset = createSet({
       {
         test: (value, password) => value === password,
         // set the first additional arguments from the context
-        args: context => [context.password],
+        args: ({ context }) => [context.password],
       },
     ],
   }),

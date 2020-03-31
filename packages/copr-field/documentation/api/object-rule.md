@@ -22,7 +22,7 @@ Used to pass multiple tests on a value.
 
 All `Rule` types have a single method in common:
 
-- validate(value, context, observer)
+- validate(value, options, observer)
 
 These methods are documented in the page of each `Rule` type.
 

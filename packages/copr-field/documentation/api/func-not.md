@@ -6,7 +6,7 @@ Create a [`LogicRule`](object-rule-logic.md) that succeeds if all its rules fail
 
 #### Arguments
 
-- `options`: _`Object`_ – informations about the rule.
+- `options`: _`Object`_ – Informations about the rule.
 
 ##### Options
 

@@ -6,7 +6,7 @@ Create a [`LogicRule`](object-rule-logic.md) that succeeds if at least one of it
 
 #### Arguments
 
-- `options`: _`Object`_ – informations about the rule.
+- `options`: _`Object`_ – Informations about the rule.
 
 ##### Options
 

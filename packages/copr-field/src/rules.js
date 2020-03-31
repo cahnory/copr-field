@@ -32,22 +32,22 @@ export const prepareLogic = rule => {
     operator: prepareLogicOperator(rule.operator),
     rules: [].concat(rule.rules).map(prepareRule),
   };
-  logicRule.validate = (value, context, observer) =>
-    runLogicRule(logicRule, value, context, observer);
+  logicRule.validate = (value, options, observer) =>
+    runLogicRule(logicRule, value, options, observer);
 
   return logicRule;
 };
 
 export const prepareTest = rule => {
-  const test = {
+  const testRule = {
     getArgs: prepareRuleGetArgs(rule.getArgs || rule.args),
     meta: prepareRuleMeta(rule.meta),
     test: prepareRuleTest(rule.test),
   };
-  test.validate = (value, context, observer) =>
-    runTestRule(test, value, context, observer);
+  testRule.validate = (value, options, observer) =>
+    runTestRule(testRule, value, options, observer);
 
-  return test;
+  return testRule;
 };
 
 export const prepareRuleGetArgs = (args = () => []) => {
@@ -90,8 +90,8 @@ export const prepareLogicOperator = operator => {
   return allOperator;
 };
 
-export const runRuleList = (value, ruleList, context, observer) => {
-  const results = collectRuleResults(value, ruleList, context, {
+export const runRuleList = (value, ruleList, options, observer) => {
+  const results = collectRuleResults(value, ruleList, options, {
     next: nextResult =>
       observer.next({
         content: nextResult.content,
@@ -106,19 +106,19 @@ export const runRuleList = (value, ruleList, context, observer) => {
   };
 };
 
-export const runLogicRule = (rule, value, context, observer) =>
+export const runLogicRule = (rule, value, options, observer) =>
   runLogicOperator(
     rule,
     value,
-    collectRuleResults(value, rule.rules, context, {
+    collectRuleResults(value, rule.rules, options, {
       next: nextResult =>
         observer.next(runLogicOperator(rule, value, nextResult)),
       complete: observer.complete,
     }),
   );
 
-export const runTestRule = (rule, value, context, observer) => {
-  const isValid = rule.test(value, ...rule.getArgs(context));
+export const runTestRule = (rule, value, options, observer) => {
+  const isValid = rule.test(value, ...rule.getArgs({ ...options, rule }));
   const isPending = typeof isValid !== 'boolean';
 
   if (isPending) {
@@ -169,7 +169,7 @@ export const runLogicOperator = (logic, value, result) => {
   };
 };
 
-export const collectRuleResults = (value, rules, context, observer) => {
+export const collectRuleResults = (value, rules, options, observer) => {
   let pendings = 0;
   let result = rules.reduce(
     (acc, rule, index) => {
@@ -196,7 +196,15 @@ export const collectRuleResults = (value, rules, context, observer) => {
           }
         },
       };
-      const subResult = rule.validate(value, context, subObserver);
+      const subResult = rule.validate(
+        value,
+        {
+          ...options,
+          rule,
+          rulePath: (options.rulePath || []).concat(index),
+        },
+        subObserver,
+      );
 
       if (subResult.isPending) {
         acc.isPending = true;

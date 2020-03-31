@@ -39,7 +39,7 @@ If the result of a [`Test`](test-object) is Pending. _[See "Async rules"](guides
 
 ### isValid: _`boolean`_
 
-If the value is considered valid. `isValid` is true if `error` is `undefined` and `isPending` is false.
+If the value is considered valid. `isValid` is `true` if `error` is `undefined` and `isPending` is false.
 
 ### node: [_`Field`_](object-copr-field.md)_`|`_[_`Rule`_](object-rule.md)_`|`_[_`Set`_](object-copr-set.md)_`|`_[_`TestRule`_](object-rule-test.md)
 

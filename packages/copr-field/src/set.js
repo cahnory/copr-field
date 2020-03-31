@@ -41,7 +41,12 @@ const createCopperSet = copr => {
     }, {});
   };
 
-  const validate = (input, { context, observer: observerOption } = {}) => {
+  const validate = (
+    input,
+    { context, observer: observerOption } = {},
+    _root = setCopr,
+    _path = [],
+  ) => {
     let failures = 0;
     let pendings = 0;
     let isEmpty = true;
@@ -58,50 +63,55 @@ const createCopperSet = copr => {
     });
 
     let content = formEntries.reduce((acc, [name, field]) => {
-      const fieldResult = field.validate(input[name], {
-        context,
-        observer: {
-          next: asyncResult => {
-            if (fieldResult.isPending) {
-              if (!initPendingSkipped) {
-                initPendingSkipped = true;
-                return;
-              }
-              if (!asyncResult.isPending) {
-                if (asyncResult.isValid) {
-                  failures -= 1;
+      const fieldResult = field.validate(
+        input[name],
+        {
+          context,
+          observer: {
+            next: asyncResult => {
+              if (fieldResult.isPending) {
+                if (!initPendingSkipped) {
+                  initPendingSkipped = true;
+                  return;
+                }
+                if (!asyncResult.isPending) {
+                  if (asyncResult.isValid) {
+                    failures -= 1;
+                  }
+
+                  pendings -= 1;
                 }
 
-                pendings -= 1;
+                content = {
+                  ...content,
+                  [name]: asyncResult,
+                };
+
+                const asyncError =
+                  (isEmpty && !allowEmpty && VALIDATION_EMPTY) ||
+                  (failures ? VALIDATION_CONTENT : undefined);
+
+                observer.next(
+                  createResult({
+                    content,
+                    error: asyncError,
+                    isEmpty,
+                    isPending: !isEmpty && !!pendings,
+                    value,
+                  }),
+                );
               }
-
-              content = {
-                ...content,
-                [name]: asyncResult,
-              };
-
-              const asyncError =
-                (isEmpty && !allowEmpty && VALIDATION_EMPTY) ||
-                (failures ? VALIDATION_CONTENT : undefined);
-
-              observer.next(
-                createResult({
-                  content,
-                  error: asyncError,
-                  isEmpty,
-                  isPending: !isEmpty && !!pendings,
-                  value,
-                }),
-              );
-            }
-          },
-          complete: () => {
-            if (!pendings && fieldResult.isPending) {
-              observer.complete();
-            }
+            },
+            complete: () => {
+              if (!pendings && fieldResult.isPending) {
+                observer.complete();
+              }
+            },
           },
         },
-      });
+        _root,
+        _path.concat(name),
+      );
 
       if (!fieldResult.isValid) {
         failures += 1;
