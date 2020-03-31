@@ -25,11 +25,14 @@ const CoprForm = ({
     handler.current.onUpdate = onUpdate;
   }, [onChange, onUpdate]);
 
+  const prevResult = useRef();
+
   const observer = useRef();
   const getNewObserver = useCallback(() => {
     const newObserver = {
       next: nextResult => {
         if (mounted.current && newObserver === observer.current) {
+          prevResult.current = nextResult;
           setResult(nextResult);
 
           if (handler.current.onUpdate) {
@@ -54,33 +57,28 @@ const CoprForm = ({
 
     return copr.getValue();
   });
+
   const validate = useCallback(
     (newInput, validateObserver) => {
       const newValue = copr.getValue(newInput);
 
       return copr.validate(newValue, {
         context:
-          typeof validationContext === 'object' &&
-          !Array.isArray(validationContext)
-            ? { value: newValue, ...validationContext }
-            : validationContext,
+          typeof validationContext !== 'object' ||
+          Array.isArray(validationContext)
+            ? validationContext
+            : {
+                prevResult: prevResult.current,
+                value: newValue,
+                ...validationContext,
+              },
         observer: validateObserver,
       });
     },
     [copr, validationContext],
   );
 
-  const [result, setResult] = useState(() => {
-    const value = copr.getValue(input);
-
-    return copr.validate(value, {
-      context:
-        typeof context === 'object' && !Array.isArray(validationContext)
-          ? { value, ...validationContext }
-          : validationContext,
-      observer: getNewObserver(),
-    });
-  });
+  const [result, setResult] = useState(() => validate(input, getNewObserver()));
 
   useEffect(() => {
     if (controlledInput !== null) {
@@ -98,6 +96,8 @@ const CoprForm = ({
         newInput,
         controlledInput === null ? getNewObserver() : undefined,
       );
+
+      prevResult.current = newResult;
 
       if (handler.current.onChange) {
         handler.current.onChange({

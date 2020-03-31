@@ -4,6 +4,9 @@
 
 Holds current context [`Copr`](../../../copr-field/documentation/api/object-copr.md) and [`Result`](../../../copr-field/documentation/api/object-result.md). It also includes other handful properties and function.
 
+- [Properties](#properties)
+- [Methods](#methods)
+
 ## Properties
 
 ### copr: [`Copr`](../../../copr-field/documentation/api/object-copr.md)
