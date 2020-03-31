@@ -2,7 +2,7 @@
 
 # Creating a [`Copr`](../api/object-copr.md) from another
 
-To create a new [`Copr`](../api/object-copr.md) based on an existing one you need to merge coppers properties and call the appropriate create function.
+To create a new [`Copr`](../api/object-copr.md) based on an existing one you need to merge [`Coprs`](../api/object-copr.md) properties and call the appropriate create function.
 
 To create a [`FieldCopr`](../api/object-cop-field.md):
 

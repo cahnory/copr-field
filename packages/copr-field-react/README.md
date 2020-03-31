@@ -1,6 +1,6 @@
-# ✨ copr-field
+# ✨ @copr-field/react
 
-copr-field is a library for parsing and validating user inputs. It allows you to define rules that your inputs must follow and provides you with detailed information when they don’t.
+_@copr-field/react_ is a React library for parsing and validating user inputs using [copr-field](../../README.md).
 
 ## Table of Contents
 
@@ -12,12 +12,12 @@ copr-field is a library for parsing and validating user inputs. It allows you to
 ## Install
 
 ```bash
-$ npm install copr-field --save
+$ npm install @copr-field/react --save
 ```
 
 ## Documentation
 
-@TODO
+- [API Reference](documentation/api/README.md)
 
 ## Contributors
 
