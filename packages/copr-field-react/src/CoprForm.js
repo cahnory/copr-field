@@ -4,20 +4,37 @@ import CoprContext from './CoprContext';
 
 const CoprForm = ({
   children,
-  context,
+  context: validationContext,
   copr,
-  initialValue: initialInput,
+  defaultValue: defaultInput,
   onChange,
   onUpdate,
   value: controlledInput,
 }) => {
   const mounted = useRef(true);
+  useEffect(
+    () => () => {
+      mounted.current = false;
+    },
+    [],
+  );
+
+  const handler = useRef({ onChange, onUpdate });
+  useEffect(() => {
+    handler.current.onChange = onChange;
+    handler.current.onUpdate = onUpdate;
+  }, [onChange, onUpdate]);
+
   const observer = useRef();
   const getNewObserver = useCallback(() => {
     const newObserver = {
       next: nextResult => {
         if (mounted.current && newObserver === observer.current) {
           setResult(nextResult);
+
+          if (handler.current.onUpdate) {
+            handler.current.onUpdate(nextResult);
+          }
         }
       },
     };
@@ -31,85 +48,87 @@ const CoprForm = ({
       return controlledInput;
     }
 
-    if (initialInput !== null) {
-      return initialInput;
+    if (defaultInput !== null) {
+      return defaultInput;
     }
 
     return copr.getValue();
   });
-  const [value, setValue] = useState(() => copr.getValue(input));
-  const [result, setResult] = useState(() =>
-    copr.validate(value, {
-      context: { value, ...context },
-      observer: getNewObserver(),
-    }),
+  const validate = useCallback(
+    (newInput, validateObserver) => {
+      const newValue = copr.getValue(newInput);
+
+      return copr.validate(newValue, {
+        context:
+          typeof validationContext === 'object' &&
+          !Array.isArray(validationContext)
+            ? { value: newValue, ...validationContext }
+            : validationContext,
+        observer: validateObserver,
+      });
+    },
+    [copr, validationContext],
   );
 
-  useEffect(
-    () => () => {
-      mounted.current = false;
-    },
-    [],
-  );
+  const [result, setResult] = useState(() => {
+    const value = copr.getValue(input);
+
+    return copr.validate(value, {
+      context:
+        typeof context === 'object' && !Array.isArray(validationContext)
+          ? { value, ...validationContext }
+          : validationContext,
+      observer: getNewObserver(),
+    });
+  });
 
   useEffect(() => {
     if (controlledInput !== null) {
-      const nextValue = copr.getValue(controlledInput);
-      const nextResult = copr.validate(nextValue, {
-        context: {
-          value: nextValue,
-          ...context,
-        },
-        observer: getNewObserver(),
-      });
       setInput(controlledInput);
-      setValue(nextValue);
-      setResult(nextResult);
+      validate(controlledInput, getNewObserver());
+    }
+  }, [controlledInput, getNewObserver, validate]);
 
-      if (onUpdate) {
-        onUpdate({
-          value: nextValue,
-          input: controlledInput,
-          result: nextResult,
+  const handleInput = useCallback(
+    newInput => {
+      if (controlledInput === null) {
+        setInput(newInput);
+      }
+      const newResult = validate(
+        newInput,
+        controlledInput === null ? getNewObserver() : undefined,
+      );
+
+      if (handler.current.onChange) {
+        handler.current.onChange({
+          input: newInput,
+          result: newResult,
+          value: newResult.value,
         });
       }
-    }
-  }, [context, controlledInput, copr, getNewObserver, onUpdate]);
-
-  const handleValue = useCallback(
-    nextInput => {
-      const nextValue = copr.getValue(nextInput);
-      const nextResult = copr.validate(nextValue, {
-        context: {
-          value: nextValue,
-          ...context,
-        },
-        observer: getNewObserver(),
-      });
-      setInput(nextInput);
-      setValue(nextValue);
-      setResult(nextResult);
-
-      if (onChange) {
-        onChange({ value: nextValue, input: nextInput, result: nextResult });
-      }
     },
-    [context, copr, getNewObserver, onChange],
+    [controlledInput, getNewObserver, validate],
   );
 
-  const form = { copr, setValue: handleValue, result, path: [], value: input };
-  form.form = form;
+  const context = {
+    copr,
+    setValue: handleInput,
+    result,
+    path: [],
+    value: input !== null ? input : undefined,
+  };
+  context.form = context;
 
   return (
-    <CoprContext.Provider value={form}>
-      {typeof children === 'function' ? children(form) : children}
+    <CoprContext.Provider value={context}>
+      {typeof children === 'function' ? children(context) : children}
     </CoprContext.Provider>
   );
 };
 
 CoprForm.defaultProps = {
   context: {},
-  initialValue: null,
+  defaultValue: null,
   onChange: null,
   onUpdate: null,
   value: null,
@@ -122,7 +141,7 @@ CoprForm.propTypes = {
   ]).isRequired,
   copr: PropTypes.object.isRequired,
   context: PropTypes.object,
-  initialValue: PropTypes.any,
+  defaultValue: PropTypes.any,
   onChange: PropTypes.func,
   onUpdate: PropTypes.func,
   value: PropTypes.any,

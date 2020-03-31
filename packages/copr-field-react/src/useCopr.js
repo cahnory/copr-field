@@ -32,7 +32,10 @@ const useCopr = (name = null) => {
         ...context.value,
         [name]: newValue,
       }),
-    value: context.value[name],
+    value:
+      context.value && typeof context.value === 'object'
+        ? context.value[name]
+        : undefined,
   };
 };
 
