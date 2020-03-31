@@ -11,7 +11,8 @@
     "prettier/prettier": ["error"],
     "no-use-before-define": "off",
     "react/jsx-filename-extension": "off",
-    "react/forbid-prop-types": "off"
+    "react/forbid-prop-types": "off",
+    "sort-imports": ["error", { "ignoreDeclarationSort": true }]
   },
   "overrides": [
     {

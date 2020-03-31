@@ -10,7 +10,7 @@ import {
 } from './errors';
 
 import { observerFromOption } from './observer';
-import { runRuleList, prepareRuleList } from './rules';
+import { prepareRuleList, runRuleList } from './rules';
 import { isEmptyValue } from './type';
 
 const createCopperField = copr => {

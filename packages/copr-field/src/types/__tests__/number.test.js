@@ -4,8 +4,8 @@ import NumberType, {
   isInteger,
   isLower,
   isModulo,
-  isPositive,
   isNegative,
+  isPositive,
 } from '../number';
 
 describe('NumberType.validate', () => {
