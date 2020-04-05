@@ -89,7 +89,7 @@ describe('DateType.parse', () => {
   });
 });
 
-describe('number rules', () => {
+describe('number rule', () => {
   it('isAfter', () => {
     expect(isAfter(new Date(2), new Date(1))).toBe(true);
     expect(isAfter(new Date(1), new Date(2))).toBe(false);

@@ -7,7 +7,7 @@
     "prepare": "lerna run prepare",
     "prepublish": "yarn lint && yarn test",
     "lint": "eslint .",
-    "test": "jest --coverage"
+    "test": "jest --testMatch=\"**/__tests__/**/*.test.js\" --coverage"
   },
   "devDependencies": {
     "@babel/cli": "^7.8.4",

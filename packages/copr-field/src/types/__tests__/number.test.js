@@ -71,7 +71,7 @@ describe('NumberType.parse', () => {
   });
 });
 
-describe('number rules', () => {
+describe('number rule', () => {
   it('isEqual', () => {
     expect(isEqual(1, 1)).toBe(true);
     expect(isEqual(1, -1)).toBe(false);

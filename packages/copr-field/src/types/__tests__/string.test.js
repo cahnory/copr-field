@@ -28,7 +28,7 @@ describe('StringType.parse', () => {
   });
 });
 
-describe('string rules', () => {
+describe('string rule', () => {
   it('isEqual', () => {
     expect(isEqual('a', 'a')).toBe(true);
     expect(isEqual('a', 'b')).toBe(false);

@@ -1,6 +1,6 @@
 export { default, default as createField } from './field';
 export { default as createSet } from './set';
-export { all, not, oneOf } from './rules';
+export { all, not, oneOf } from './utils';
 
 export {
   default as DateType,

@@ -5,7 +5,7 @@ import {
   VALIDATION_TYPE,
 } from './errors';
 
-import { observerFromOption } from './observer';
+import createObserver from './observer';
 
 const createCopperSet = copr => {
   if (typeof copr !== 'object') {
@@ -53,7 +53,7 @@ const createCopperSet = copr => {
     let result;
     let initPendingSkipped = false;
     const value = {};
-    const observer = observerFromOption(observerOption);
+    const observer = createObserver(observerOption);
 
     Promise.resolve().then(() => {
       observer.next(result);
