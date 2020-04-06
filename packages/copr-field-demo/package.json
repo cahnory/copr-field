@@ -1,0 +1,21 @@
+{
+  "name": "@copr-field/demo",
+  "version": "0.6.3",
+  "main": "src/index.js",
+  "private": true,
+  "dependencies": {
+    "@copr-field/react": "^0.6",
+    "bootstrap": "4.4.1",
+    "copr-field": "^0.6",
+    "prop-types": "^15.7.2",
+    "react": "16.12.0",
+    "react-dom": "16.12.0"
+  },
+  "scripts": {
+    "prepare": "parcel build src/index.html",
+    "start": "parcel src/index.html"
+  },
+  "devDependencies": {
+    "parcel": "^1.12.4"
+  }
+}

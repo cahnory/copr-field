@@ -1,0 +1,46 @@
+h1 {
+  text-align: center;
+}
+
+.links {
+  padding: 0;
+}
+.links li {
+  display: inline;
+}
+.links li + li:before {
+  content: " | ";
+  display: inline;
+}
+
+.rule-icon {
+  display: inline-block;
+  text-align: center;
+  width: 1em;
+}
+
+.form-control.is-warning {
+  border-color: #f9b115 !important;
+}
+.form-control.is-warning:focus {
+  border-color: #f9b115 !important;
+  box-shadow: 0 0 0 0.2rem rgba(249, 177, 21, 0.25) !important;
+}
+.pending-feedback {
+  margin-top: 0.25rem;
+  font-size: 80%;
+  color: #f9b115;
+  width: 100%;
+}
+.help-hidden,
+.sr-only {
+  border: 0;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}

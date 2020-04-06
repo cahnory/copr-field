@@ -1,4 +1,5 @@
 {
+  "name": "copr-field",
   "private": true,
   "workspaces": [
     "packages/*"

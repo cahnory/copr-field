@@ -6,5 +6,7 @@
 
 /packages/copr-field/lib
 /packages/copr-field/node_modules
+/packages/copr-field-demo/.cache
+/packages/copr-field-demo/dist
 /packages/copr-field-react/lib
 /packages/copr-field-react/node_modules

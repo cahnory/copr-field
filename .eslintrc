@@ -2,7 +2,7 @@
   "env": {
     "es6": true
   },
-  "extends": ["airbnb", "airbnb/hooks", "prettier"],
+  "extends": ["airbnb", "airbnb/hooks", "prettier", "prettier/react"],
   "parserOptions": {
     "sourceType": "module"
   },
@@ -21,6 +21,12 @@
         "jest": true,
         "browser": false,
         "node": true
+      }
+    },
+    {
+      "files": ["packages/copr-field-demo/**/*"],
+      "env": {
+        "browser": true
       }
     }
   ]
