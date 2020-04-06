@@ -10,18 +10,14 @@ import {
   VALIDATION_TYPE,
 } from './errors';
 
-const createCopperField = copr => {
+const createField = copr => {
   if (typeof copr !== 'object') {
     throw new Error(INVALIDE_COPR);
   }
 
-  if (typeof copr.allowEmpty !== 'boolean') {
-    throw new Error(INVALIDE_COPR_ALLOW_EMPTY);
-  }
-
   const logic = all(copr.rules);
   const fieldCopr = {
-    allowEmpty: copr.allowEmpty,
+    allowEmpty: createAllowEmpty(copr.allowEmpty),
     getValue: input => getValue(fieldCopr, input),
     meta: createMeta(copr.meta),
     parse: input => parse(fieldCopr, input),
@@ -34,7 +30,7 @@ const createCopperField = copr => {
   return fieldCopr;
 };
 
-export default createCopperField;
+export default createField;
 
 const validate = (
   field,
@@ -157,3 +153,11 @@ const createResult = (
   nodeType: 'field',
   value,
 });
+
+const createAllowEmpty = (allowEmpty = false) => {
+  if (typeof allowEmpty !== 'boolean') {
+    throw new Error(INVALIDE_COPR_ALLOW_EMPTY);
+  }
+
+  return allowEmpty;
+};

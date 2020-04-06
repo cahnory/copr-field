@@ -7,7 +7,7 @@ import {
 
 import createObserver from './observer';
 
-const createCopperSet = copr => {
+const createSet = copr => {
   if (typeof copr !== 'object') {
     throw new Error(INVALIDE_COPR);
   }
@@ -169,4 +169,4 @@ const createCopperSet = copr => {
   return setCopr;
 };
 
-export default createCopperSet;
+export default createSet;
