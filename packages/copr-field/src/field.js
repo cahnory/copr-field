@@ -15,7 +15,7 @@ const createField = copr => {
     throw new Error(INVALIDE_COPR);
   }
 
-  const logic = all(copr.rules);
+  const logic = all({ rules: copr.rules });
   const fieldCopr = {
     allowEmpty: createAllowEmpty(copr.allowEmpty),
     getValue: input => getValue(fieldCopr, input),
@@ -61,7 +61,7 @@ const validate = (
   }
 
   try {
-    value = parse(input);
+    value = field.parse(input);
   } catch (e) {
     const result = createResult(field, {
       content: [],

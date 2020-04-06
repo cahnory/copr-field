@@ -30,7 +30,7 @@ export const createRule = rule => {
     : createLogicRule(rule);
 };
 
-export const createRuleList = rules =>
+export const createRuleList = (rules = []) =>
   (!Array.isArray(rules) ? [rules] : rules).map(createRule);
 
 export const createOperator = operator => {
