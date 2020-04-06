@@ -60,7 +60,7 @@ export const validate = (logic, value, options, observer) => {
               .concat(asyncSubResult)
               .concat(result.content.slice(index + 1)),
           };
-          observer.next(result);
+          observer.next(runLogicOperator(logic, value, result));
         },
         complete: () => {
           if (!pendings) {
