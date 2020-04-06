@@ -1,12 +1,12 @@
 {
   "name": "@copr-field/demo",
-  "version": "0.6.3",
+  "version": "0.6.4",
   "main": "src/index.js",
   "private": true,
   "dependencies": {
     "@copr-field/react": "^0.6",
     "bootstrap": "4.4.1",
-    "copr-field": "^0.6",
+    "copr-field": "^0.6.4",
     "prop-types": "^15.7.2",
     "react": "16.12.0",
     "react-dom": "16.12.0"
