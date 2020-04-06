@@ -1,7 +1,6 @@
-import { createType } from '../type';
 import numberType from './number';
 
-export default createType({
+export default {
   parse: input =>
     new Date(numberType.validate(input) ? numberType.parse(input) : input),
   validate: input =>
@@ -11,7 +10,7 @@ export default createType({
         numberType.validate(input) ? numberType.parse(input) : input,
       ).getTime(),
     ),
-});
+};
 
 export const isAfter = (value, inf) => value > inf;
 

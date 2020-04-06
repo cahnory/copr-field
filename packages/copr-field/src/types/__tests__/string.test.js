@@ -1,30 +1,37 @@
-import StringType, { isEqual, isLonger, isShorter, isSized } from '../string';
+import StringType, {
+  isEqual,
+  isLonger,
+  isMatching,
+  isShorter,
+  isSized,
+} from '../string';
+import { typeParse, typeValidate } from '../../type';
 
 describe('StringType.validate', () => {
   it('handles strings', () => {
-    expect(StringType.validate('0')).toBe(true);
-    expect(StringType.validate(0)).toBe(true);
+    expect(typeValidate(StringType, '0')).toBe(true);
+    expect(typeValidate(StringType, 0)).toBe(true);
   });
   it('rejects non string inputs', () => {
-    expect(StringType.validate('')).toBe(false);
-    expect(StringType.validate(null)).toBe(false);
-    expect(StringType.validate(undefined)).toBe(false);
-    expect(StringType.validate(true)).toBe(false);
-    expect(StringType.validate(false)).toBe(false);
+    expect(typeValidate(StringType, '')).toBe(false);
+    expect(typeValidate(StringType, null)).toBe(false);
+    expect(typeValidate(StringType, undefined)).toBe(false);
+    expect(typeValidate(StringType, true)).toBe(false);
+    expect(typeValidate(StringType, false)).toBe(false);
   });
 });
 
 describe('StringType.parse', () => {
   it('handles strings', () => {
-    expect(StringType.parse('0')).toEqual('0');
-    expect(StringType.parse(0)).toEqual('0');
+    expect(typeParse(StringType, '0')).toEqual('0');
+    expect(typeParse(StringType, 0)).toEqual('0');
   });
   it('returns undefined for non string inputs', () => {
-    expect(StringType.parse('')).toEqual(undefined);
-    expect(StringType.parse(null)).toEqual(undefined);
-    expect(StringType.parse(undefined)).toEqual(undefined);
-    expect(StringType.parse(true)).toEqual(undefined);
-    expect(StringType.parse(false)).toEqual(undefined);
+    expect(typeParse(StringType, '')).toEqual(undefined);
+    expect(typeParse(StringType, null)).toEqual(undefined);
+    expect(typeParse(StringType, undefined)).toEqual(undefined);
+    expect(typeParse(StringType, true)).toEqual(undefined);
+    expect(typeParse(StringType, false)).toEqual(undefined);
   });
 });
 
@@ -37,6 +44,10 @@ describe('string rule', () => {
     expect(isLonger('ab', 2)).toBe(false);
     expect(isLonger('abc', 2)).toBe(true);
     expect(isLonger('ab', 3)).toBe(false);
+  });
+  it('isMatching', () => {
+    expect(isMatching('ab', /^abc$/)).toBe(false);
+    expect(isMatching('abc', /^abc$/)).toBe(true);
   });
   it('isShorter', () => {
     expect(isShorter('ab', 2)).toBe(false);

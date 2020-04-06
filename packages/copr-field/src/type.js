@@ -1,17 +1,23 @@
 import { INVALIDE_TYPE } from './errors';
 
-export const createType = ({ parse, validate }) => {
+const createType = ({ parse, validate }) => {
   if (typeof parse !== 'function' || typeof validate !== 'function') {
     throw new Error(INVALIDE_TYPE);
   }
 
-  const safeValidate = input => !isEmptyValue(input) && validate(input);
-
   return {
-    parse: input => (safeValidate(input) ? parse(input) : undefined),
-    validate: safeValidate,
+    parse,
+    validate,
   };
 };
+
+export default createType;
+
+export const typeParse = (type, input) =>
+  typeValidate(type, input) ? type.parse(input) : undefined;
+
+export const typeValidate = (type, input) =>
+  !isEmptyValue(input) && type.validate(input);
 
 export const isEmptyValue = input =>
   input === '' || input === null || input === undefined;

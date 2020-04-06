@@ -1,11 +1,10 @@
 import createMeta from './meta';
 import createObserver from './observer';
 import { all } from './utils';
-import { isEmptyValue } from './type';
+import createType, { isEmptyValue, typeParse, typeValidate } from './type';
 import {
   INVALIDE_COPR,
   INVALIDE_COPR_ALLOW_EMPTY,
-  INVALIDE_COPR_TYPE,
   VALIDATION_EMPTY,
   VALIDATION_RULE,
   VALIDATION_TYPE,
@@ -20,14 +19,6 @@ const createCopperField = copr => {
     throw new Error(INVALIDE_COPR_ALLOW_EMPTY);
   }
 
-  if (
-    typeof copr.type !== 'object' ||
-    typeof copr.type.parse !== 'function' ||
-    typeof copr.type.validate !== 'function'
-  ) {
-    throw new Error(INVALIDE_COPR_TYPE);
-  }
-
   const logic = all(copr.rules);
   const fieldCopr = {
     allowEmpty: copr.allowEmpty,
@@ -35,7 +26,7 @@ const createCopperField = copr => {
     meta: createMeta(copr.meta),
     parse: input => parse(fieldCopr, input),
     rules: logic.rules,
-    type: copr.type,
+    type: createType(copr.type),
     validate: (input, options, _root, _path) =>
       validate(fieldCopr, logic, input, options, _root, _path),
   };
@@ -138,11 +129,11 @@ const parse = (field, input) => {
     return undefined;
   }
 
-  if (!field.type.validate(input)) {
+  if (!typeValidate(field.type, input)) {
     throw new Error(VALIDATION_TYPE);
   }
 
-  return field.type.parse(input);
+  return typeParse(field.type, input);
 };
 
 const getValue = (field, input) => {

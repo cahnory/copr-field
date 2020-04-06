@@ -11,14 +11,10 @@ const createTestRule = rule => {
     throw new Error(INVALIDE_TEST_FUNC);
   }
 
-  const getArgs = Array.isArray(rule.args) ? () => rule.args : rule.getArgs;
-
-  if (typeof getArgs !== 'function') {
-    throw new Error(INVALIDE_TEST_ARGS);
-  }
-
   const testRule = {
-    getArgs,
+    getArgs: createTestGetArgs(
+      rule.args === undefined ? rule.getArgs : rule.args,
+    ),
     meta: createMeta(rule.meta),
     test: rule.test,
   };
@@ -37,6 +33,11 @@ export const validate = (rule, value, options, observer) => {
   if (isPending) {
     Promise.resolve(isValid).then(asyncPass => {
       const passIsValid = typeof asyncPass === 'boolean';
+
+      if (!passIsValid) {
+        observer.error(new Error(INVALIDE_TEST_RETURN));
+      }
+
       observer.next({
         content: [],
         error: asyncPass ? undefined : VALIDATION_RULE,
@@ -48,10 +49,6 @@ export const validate = (rule, value, options, observer) => {
         value,
       });
       observer.complete();
-
-      if (!passIsValid) {
-        throw new Error(INVALIDE_TEST_RETURN);
-      }
     });
   }
 
@@ -65,4 +62,14 @@ export const validate = (rule, value, options, observer) => {
     nodeType: 'test',
     value,
   };
+};
+
+export const createTestGetArgs = (args = []) => {
+  const getArgs = Array.isArray(args) ? () => args : args;
+
+  if (typeof getArgs !== 'function') {
+    throw new Error(INVALIDE_TEST_ARGS);
+  }
+
+  return getArgs;
 };

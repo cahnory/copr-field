@@ -1,10 +1,6 @@
 import createMeta from '../meta';
 import createTestRule from './test';
-import {
-  INVALIDE_RULE,
-  INVALIDE_RULE_OPERATOR,
-  VALIDATION_RULE,
-} from '../errors';
+import { INVALIDE_OPERATOR, INVALIDE_RULE, VALIDATION_RULE } from '../errors';
 
 const createLogicRule = rule => {
   const logicRule = {
@@ -39,7 +35,7 @@ export const createRuleList = rules =>
 
 export const createOperator = operator => {
   if (typeof operator !== 'function') {
-    throw new Error(INVALIDE_RULE_OPERATOR);
+    throw new Error(INVALIDE_OPERATOR);
   }
 
   return operator;

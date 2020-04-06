@@ -1,12 +1,13 @@
 const createObserver = observer => {
-  switch (typeof observer) {
-    case 'object':
-      return observerFromObject(observer);
-    case 'function':
-      return observerFromFunction(observer);
-    default:
-      return noopObserver();
+  if (typeof observer === 'function') {
+    return observerFromFunction(observer);
   }
+
+  if (observer && typeof observer === 'object') {
+    return observerFromObject(observer);
+  }
+
+  return noopObserver();
 };
 
 export default createObserver;
@@ -35,4 +36,4 @@ export const noopObserver = () => ({
   next: noop,
 });
 
-const noop = () => {};
+export const noop = () => {};

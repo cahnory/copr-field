@@ -23,7 +23,7 @@
     "validator"
   ],
   "peerDependencies": {
-    "copr-field": "^0.5",
+    "copr-field": "^0.6",
     "prop-types": "^15",
     "react": "^16"
   },

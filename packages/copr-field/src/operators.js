@@ -1,14 +1,14 @@
 export const allOperator = ({ isPending, failures }) => ({
   isPending,
-  isValid: !failures,
+  isValid: !failures && !isPending,
 });
 
-export const notOperator = ({ isPending, failures }) => ({
+export const notOperator = ({ isPending, passes }) => ({
   isPending,
-  isValid: !!failures,
+  isValid: !passes && !isPending,
 });
 
 export const oneOfOperator = ({ isPending, passes }) => ({
-  isPending: !!passes || isPending,
+  isPending,
   isValid: !!passes,
 });

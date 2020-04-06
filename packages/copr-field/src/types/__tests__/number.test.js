@@ -7,67 +7,68 @@ import NumberType, {
   isNegative,
   isPositive,
 } from '../number';
+import { typeParse, typeValidate } from '../../type';
 
 describe('NumberType.validate', () => {
   it('handles integers expressed as number', () => {
-    expect(NumberType.validate(-1)).toBe(true);
-    expect(NumberType.validate(0)).toBe(true);
-    expect(NumberType.validate(1)).toBe(true);
+    expect(typeValidate(NumberType, -1)).toBe(true);
+    expect(typeValidate(NumberType, 0)).toBe(true);
+    expect(typeValidate(NumberType, 1)).toBe(true);
   });
   it('handles integers expressed as string', () => {
-    expect(NumberType.validate('-1')).toBe(true);
-    expect(NumberType.validate('0')).toBe(true);
-    expect(NumberType.validate('1')).toBe(true);
+    expect(typeValidate(NumberType, '-1')).toBe(true);
+    expect(typeValidate(NumberType, '0')).toBe(true);
+    expect(typeValidate(NumberType, '1')).toBe(true);
   });
   it('handles floats expressed as number', () => {
-    expect(NumberType.validate(-1.23)).toBe(true);
-    expect(NumberType.validate(0.12)).toBe(true);
-    expect(NumberType.validate(1.23)).toBe(true);
+    expect(typeValidate(NumberType, -1.23)).toBe(true);
+    expect(typeValidate(NumberType, 0.12)).toBe(true);
+    expect(typeValidate(NumberType, 1.23)).toBe(true);
   });
   it('handles floats expressed as string', () => {
-    expect(NumberType.validate('-1.23')).toBe(true);
-    expect(NumberType.validate('0.12')).toBe(true);
-    expect(NumberType.validate('1.23')).toBe(true);
+    expect(typeValidate(NumberType, '-1.23')).toBe(true);
+    expect(typeValidate(NumberType, '0.12')).toBe(true);
+    expect(typeValidate(NumberType, '1.23')).toBe(true);
   });
   it('rejects non number inputs', () => {
-    expect(NumberType.validate('abc')).toBe(false);
-    expect(NumberType.validate('')).toBe(false);
-    expect(NumberType.validate(NaN)).toBe(false);
-    expect(NumberType.validate(null)).toBe(false);
-    expect(NumberType.validate(undefined)).toBe(false);
-    expect(NumberType.validate(true)).toBe(false);
-    expect(NumberType.validate(false)).toBe(false);
+    expect(typeValidate(NumberType, 'abc')).toBe(false);
+    expect(typeValidate(NumberType, '')).toBe(false);
+    expect(typeValidate(NumberType, NaN)).toBe(false);
+    expect(typeValidate(NumberType, null)).toBe(false);
+    expect(typeValidate(NumberType, undefined)).toBe(false);
+    expect(typeValidate(NumberType, true)).toBe(false);
+    expect(typeValidate(NumberType, false)).toBe(false);
   });
 });
 
 describe('NumberType.parse', () => {
   it('handles integers expressed as number', () => {
-    expect(NumberType.parse(-1)).toEqual(-1);
-    expect(NumberType.parse(0)).toEqual(0);
-    expect(NumberType.parse(1)).toEqual(1);
+    expect(typeParse(NumberType, -1)).toEqual(-1);
+    expect(typeParse(NumberType, 0)).toEqual(0);
+    expect(typeParse(NumberType, 1)).toEqual(1);
   });
   it('handles integers expressed as string', () => {
-    expect(NumberType.parse('-1')).toEqual(-1);
-    expect(NumberType.parse('0')).toEqual(0);
-    expect(NumberType.parse('1')).toEqual(1);
+    expect(typeParse(NumberType, '-1')).toEqual(-1);
+    expect(typeParse(NumberType, '0')).toEqual(0);
+    expect(typeParse(NumberType, '1')).toEqual(1);
   });
   it('handles floats expressed as number', () => {
-    expect(NumberType.parse(-1.23)).toEqual(-1.23);
-    expect(NumberType.parse(0.12)).toEqual(0.12);
-    expect(NumberType.parse(1.23)).toEqual(1.23);
+    expect(typeParse(NumberType, -1.23)).toEqual(-1.23);
+    expect(typeParse(NumberType, 0.12)).toEqual(0.12);
+    expect(typeParse(NumberType, 1.23)).toEqual(1.23);
   });
   it('handles floats expressed as string', () => {
-    expect(NumberType.parse('-1.23')).toEqual(-1.23);
-    expect(NumberType.parse('0.12')).toEqual(0.12);
-    expect(NumberType.parse('1.23')).toEqual(1.23);
+    expect(typeParse(NumberType, '-1.23')).toEqual(-1.23);
+    expect(typeParse(NumberType, '0.12')).toEqual(0.12);
+    expect(typeParse(NumberType, '1.23')).toEqual(1.23);
   });
   it('returns undefined for non number inputs', () => {
-    expect(NumberType.parse('')).toEqual(undefined);
-    expect(NumberType.parse(NaN)).toEqual(undefined);
-    expect(NumberType.parse(null)).toEqual(undefined);
-    expect(NumberType.parse(undefined)).toEqual(undefined);
-    expect(NumberType.parse(true)).toEqual(undefined);
-    expect(NumberType.parse(false)).toEqual(undefined);
+    expect(typeParse(NumberType, '')).toEqual(undefined);
+    expect(typeParse(NumberType, NaN)).toEqual(undefined);
+    expect(typeParse(NumberType, null)).toEqual(undefined);
+    expect(typeParse(NumberType, undefined)).toEqual(undefined);
+    expect(typeParse(NumberType, true)).toEqual(undefined);
+    expect(typeParse(NumberType, false)).toEqual(undefined);
   });
 });
 

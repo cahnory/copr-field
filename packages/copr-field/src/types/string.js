@@ -1,9 +1,7 @@
-import { createType } from '../type';
-
-export default createType({
+export default {
   parse: input => `${input}`,
   validate: input => typeof input === 'string' || typeof input === 'number',
-});
+};
 
 export const isEqual = (value, other) => value === other;
 
